@@ -1,5 +1,5 @@
 ﻿using Knockback.Handlers;
-using Knockback.Utils;
+using Knockback.Utility;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -262,17 +262,17 @@ namespace Knockback.Core
 
             private void CreateBulletPool(GameObject bulletPrefab)
             {
-                KB_PoolHandlers.instance.CreatePool((poolName + gunCore.GetInstanceID()), bulletPrefab, poolSize);
+                KB_PoolHandler.instance.CreatePool((poolName + gunCore.GetInstanceID()), bulletPrefab, poolSize);
             }
 
             private void DestroyPool()
             {
-                KB_PoolHandlers.instance.DestroyPool(poolName + gunCore.GetInstanceID());
+                KB_PoolHandler.instance.DestroyPool(poolName + gunCore.GetInstanceID());
             }
 
             private void SpawnBulletFromPool(Transform projectileTransform, float velocity, float impactDamage)
             {
-                GameObject bulletInstance = KB_PoolHandlers.instance.GetFromPool(poolName);
+                GameObject bulletInstance = KB_PoolHandler.instance.GetFromPool(poolName);
                 bulletInstance.transform.position = projectileTransform.position;
                 bulletInstance.transform.rotation = projectileTransform.rotation;
                 bulletInstance.GetComponent<KB_BulletCore>().SetBulletParameters(impactDamage, projectileTransform.rotation * Vector2.right, velocity);

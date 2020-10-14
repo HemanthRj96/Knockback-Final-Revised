@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 
-namespace Knockback.Utils
+namespace Knockback.Utility
 {
     public class KB_Singleton<T> : MonoBehaviour where T : KB_Singleton<T>
     {
         public static T instance;
+        protected bool doNotDestoryOnLoad = true;
 
         protected virtual void Awake()
         {
@@ -15,7 +16,9 @@ namespace Knockback.Utils
             }
 
             instance = this as T;
-            DontDestroyOnLoad(this);
+
+            if (doNotDestoryOnLoad)
+                DontDestroyOnLoad(this);
         }
     }
 }

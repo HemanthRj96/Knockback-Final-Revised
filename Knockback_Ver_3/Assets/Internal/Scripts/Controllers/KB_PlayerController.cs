@@ -3,7 +3,7 @@ using UnityStandardAssets.CrossPlatformInput;
 using Mirror;
 using System.Collections;
 using Knockback.Handlers;
-using Knockback.Utils;
+using Knockback.Utility;
 
 namespace Knockback.Controllers
 {
@@ -65,6 +65,7 @@ namespace Knockback.Controllers
         useMouseAndKeyboard ? Input.GetButtonDown(dashingInputString) : CrossPlatformInputManager.GetButtonDown(dashingInputString);
         private bool fireInput =>
         useMouseAndKeyboard ? Input.GetButtonDown(fireInputString) : CrossPlatformInputManager.GetButtonDown(fireInputString);
+        private bool rightMouseButton => Input.GetKeyDown(KeyCode.Mouse1);
         public Transform weaponSlot => transform.GetChild(1);
 
 
@@ -311,7 +312,11 @@ namespace Knockback.Controllers
                     rotationDegress = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
 
                 targetRotation = Quaternion.Euler(0, 0, rotationDegress);
-                localCameraController?.AddAimOffset(difference);
+
+                if (controller.useMouseAndKeyboard && controller.rightMouseButton)
+                    localCameraController?.AddAimOffset(difference);
+                else
+                    localCameraController?.AddAimOffset(difference);
 
                 if (rotationDegress > 90 || rotationDegress < -90)
                 {

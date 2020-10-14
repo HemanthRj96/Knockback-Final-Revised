@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Knockback.Enums
+namespace Knockback.Utility
 {
     public enum SplashDamageType
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Knockback.Handlers;
 using EZCameraShake;
-using Knockback.Utils;
+using Knockback.Utility;
 
 namespace Knockback.Controllers
 {

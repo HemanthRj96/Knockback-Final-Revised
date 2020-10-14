@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Knockback.Controllers;
-using Knockback.Utils;
+using Knockback.Utility;
 using Mirror.Examples.Additive;
 using TMPro;
 

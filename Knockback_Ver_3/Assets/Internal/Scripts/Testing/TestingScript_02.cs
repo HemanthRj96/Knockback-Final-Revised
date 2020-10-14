@@ -1,4 +1,4 @@
-﻿using Knockback.Utils;
+﻿using Knockback.Utility;
 using Mirror;
 using TMPro;
 using UnityEngine;

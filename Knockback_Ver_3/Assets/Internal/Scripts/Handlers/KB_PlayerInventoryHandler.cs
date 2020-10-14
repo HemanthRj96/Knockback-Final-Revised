@@ -5,7 +5,7 @@ using System;
 using Knockback.Handlers;
 using Knockback.Controllers;
 using System.Net;
-using Knockback.Utils;
+using Knockback.Utility;
 
 public class KB_PlayerInventoryHandler : MonoBehaviour
 {

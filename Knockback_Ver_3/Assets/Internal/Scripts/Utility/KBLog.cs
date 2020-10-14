@@ -2,7 +2,7 @@
 using System.Collections;
 using Mirror;
 
-namespace Knockback.Utils
+namespace Knockback.Utility
 {
     public class KBLog
     {

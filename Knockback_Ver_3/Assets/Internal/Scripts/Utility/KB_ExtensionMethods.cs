@@ -1,7 +1,7 @@
 ﻿using Mirror;
 using UnityEngine;
 
-namespace Knockback.Utils
+namespace Knockback.Utility
 {
     public static class KB_ExtensionMethods
     {

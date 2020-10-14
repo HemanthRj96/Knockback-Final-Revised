@@ -1,4 +1,4 @@
-﻿using Knockback.Utils;
+﻿using Knockback.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

@@ -3,6 +3,7 @@ using System.Collections;
 using Knockback.Core;
 using System.Collections.Generic;
 using Knockback.Controllers;
+using Knockback.Utility;
 
 public class KB_Molotov : KB_ThrowableCore, IUsableEntity
 {
