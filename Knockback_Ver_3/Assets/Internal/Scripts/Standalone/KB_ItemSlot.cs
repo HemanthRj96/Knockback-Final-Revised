@@ -1,4 +1,5 @@
 ﻿using Knockback.Handlers;
+using Knockback.Utility;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 
 public class KB_ItemSlot : MonoBehaviour
 {
-    public enum ItemSlotType { Pickup, Inventory }
+    
 
     [Header("Item slot deafult settings")]
     [Space]

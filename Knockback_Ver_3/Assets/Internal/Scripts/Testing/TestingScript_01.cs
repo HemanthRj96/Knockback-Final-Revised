@@ -1,16 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Knockback.Utility;
+using Knockback.Handlers;
+using System.Threading;
 
-[CreateAssetMenu(menuName = "Testing/TestObject")]
-public class TestingScript_01 : ScriptableObject
+public class TestingScript_01 : MonoBehaviour
 {
-    public TestingScript_01 CopyValue(int value, Vector3 myVector)
+
+    public float firstListenerTime = 0;
+    public float secondListenerTime = 0;
+    public float thirdListenerTime = 0;
+
+
+    private int numberOfInvokes = 0;
+
+
+    private void Start()
     {
-        this.myValue = value;
-        this.myVector = myVector;
-        return this;
+        KB_EventHandler.AddEvent("TestEvent", FirstListener);
+        KB_EventHandler.AddEvent("TestEvent", SecondListener);
+        KB_EventHandler.AddEvent("TestEvent", ThirdListener);
     }
 
-    public int myValue = 23;
-    public Vector3 myVector;
+    private void FirstListener(IMessage message)
+    {
+        ++numberOfInvokes;
+        firstListenerTime += (Time.realtimeSinceStartup - message.timeUntilActivation) * 1000;
+        firstListenerTime /= numberOfInvokes;
+    }
+
+    private void SecondListener(IMessage message)
+    {
+        secondListenerTime += (Time.realtimeSinceStartup - message.timeUntilActivation) * 1000;
+        secondListenerTime /= numberOfInvokes;
+    }
+
+    private void ThirdListener(IMessage message)
+    {
+        thirdListenerTime += (Time.realtimeSinceStartup - message.timeUntilActivation) * 1000;
+        thirdListenerTime /= numberOfInvokes;
+    }
 }

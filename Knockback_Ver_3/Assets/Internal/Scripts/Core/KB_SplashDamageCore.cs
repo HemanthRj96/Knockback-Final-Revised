@@ -43,7 +43,7 @@ namespace Knockback.Core
 
                 Debug.LogError($"Collided object={overlappedGameObject}|Distance from collider={distanceFromCollider}|Closest point={closestPoint}|Damage percent={damagePercent}|Final damage={finalDamage}");
 
-                damageHandle.AddDamage(finalDamage);
+                damageHandle.ApplyDamage(finalDamage);
                 overlappedObjects.Add(overlappedGameObject, finalDamage);
             }
 
@@ -65,7 +65,7 @@ namespace Knockback.Core
                 {
                     try
                     {
-                        overlappedObject.Key.GetComponent<IDamage>().AddDamage(overlappedObject.Value * damageReducePercent);
+                        overlappedObject.Key.GetComponent<IDamage>().ApplyDamage(overlappedObject.Value * damageReducePercent);
                     }
                     catch (System.Exception exc)
                     {

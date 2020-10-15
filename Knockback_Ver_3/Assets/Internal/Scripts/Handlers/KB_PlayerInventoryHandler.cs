@@ -4,7 +4,6 @@ using System.Linq;
 using System;
 using Knockback.Handlers;
 using Knockback.Controllers;
-using System.Net;
 using Knockback.Utility;
 
 public class KB_PlayerInventoryHandler : MonoBehaviour
@@ -168,7 +167,7 @@ public class KB_PlayerInventoryHandler : MonoBehaviour
             {
                 foreach (var tempSlot in tempSlots)
                 {
-                    if (tempSlot.itemSlotType == KB_ItemSlot.ItemSlotType.Inventory)
+                    if (tempSlot.itemSlotType == ItemSlotType.Inventory)
                     {
                         inventorySlots.Add(tempSlot);
                         tempSlot.SetState(true);
@@ -188,7 +187,7 @@ public class KB_PlayerInventoryHandler : MonoBehaviour
             else
                 Debug.Log("Unable to find slots from reference handler");
         }
-        catch(Exception) { new KBLog("Add reference handler"); }        
+        catch (Exception) { new KBLog("Add reference handler"); }
     }
 
     /// <summary>

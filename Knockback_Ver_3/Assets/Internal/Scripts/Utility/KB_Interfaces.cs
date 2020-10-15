@@ -18,7 +18,8 @@ namespace Knockback.Utility
     public interface IInteractableEntity
     {
         bool canUse { get; set; }
-        void OnUse();
+        void StartUse();
+        void StopUse();
     }
 
     /// <summary>
@@ -26,6 +27,17 @@ namespace Knockback.Utility
     /// </summary>
     public interface IDamage
     {
-        void AddDamage(float damage);
+        void ApplyDamage(float damage);
+        void RemoveDamage(float damage);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public interface IMessage
+    {
+        object data { get; set; }
+        GameObject source { get; set; }
+        float timeUntilActivation { get; set; }
     }
 }
