@@ -1,7 +1,6 @@
 ﻿using Knockback.Utility;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Knockback.Handlers

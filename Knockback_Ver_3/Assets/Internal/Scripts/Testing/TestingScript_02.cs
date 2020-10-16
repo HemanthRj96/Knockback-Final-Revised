@@ -1,15 +1,9 @@
-﻿using Knockback.Handlers;
-using Knockback.Utility;
-using Mirror;
-using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 
-public class TestingScript_02 : MonoBehaviour
+public class TestingScript_02
 {
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Backspace))
-            KB_EventHandler.Invoke("TestEvent", "HelloWorld", gameObject, Time.realtimeSinceStartup);
-    }
+    public string someString;
+    public float someFloat;
+
 }
