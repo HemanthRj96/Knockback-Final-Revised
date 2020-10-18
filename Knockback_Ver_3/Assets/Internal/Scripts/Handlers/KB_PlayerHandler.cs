@@ -48,8 +48,8 @@ namespace Knockback.Handlers
             spawned = true;
             GameObject go = Instantiate(playerPrefab, testSpawnSite.position, testSpawnSite.rotation);
             localPlayer = go.GetComponent<KB_PlayerController>();
-            localPlayer.isReady = true;
-            localPlayer.canMove = true;
+           // localPlayer.isReady = true;
+           // localPlayer.canMove = true;
             KB_ReferenceHandler.Add(localPlayer);
         }
 

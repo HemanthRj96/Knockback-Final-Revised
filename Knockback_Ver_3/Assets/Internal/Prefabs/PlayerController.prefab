@@ -39,9 +39,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5797141136801982630}
-  - component: {fileID: 6606749304263483239}
+  - component: {fileID: 8040496916692488111}
   - component: {fileID: 5797141136801982633}
   - component: {fileID: 5797141136801982632}
+  - component: {fileID: 9037867245203889673}
   m_Layer: 8
   m_Name: PlayerController
   m_TagString: Untagged
@@ -65,7 +66,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &6606749304263483239
+--- !u!50 &8040496916692488111
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -77,14 +78,14 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 4
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 4
+  m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!114 &5797141136801982633
 MonoBehaviour:
@@ -98,23 +99,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7564a6c797fc3849b6c57752e7fd7bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   movementXInputString: XInput
   movementYInputString: YInput
   jumpingInputString: Jump
   dashingInputString: Dash
   fireInputString: Fire
   moveSpeed: 5
-  jumpForce: 24
+  jumpForce: 3
   airControl: 0.65
   groundCheckerLayerMask:
     serializedVersion: 2
     m_Bits: 1024
   joystickDeadzone: 0.8
   useMouseAndKeyboard: 1
-  canMove: 0
+  cachedRigidbody: {fileID: 8040496916692488111}
+  cachedSpriteRenderer: {fileID: 5797141137498086850}
+  canUse: 0
+  canMove: 1
   canFly: 0
   health: 0
-  isReady: 0
+  isReady: 1
 --- !u!114 &5797141136801982632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,6 +133,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e82e4a66f581f040946bf9701ada5b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9037867245203889673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5797141136801982635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &5797141137498086855
 GameObject:
   m_ObjectHideFlags: 0

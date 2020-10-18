@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
-using Mirror;
 using System.Collections;
 using Knockback.Handlers;
 using Knockback.Utility;
@@ -11,13 +10,106 @@ namespace Knockback.Controllers
     {
         // todo: Convert all of them to readonly
         // todo: Implement player trail; Implement it another script
-        // todo: Implement the player health and armor implementation as another internal class
-        // todo: Network implementation
-        // todo: Commenting :: PlayerController
+        // todo: Commenting :: PlayerController        
+
+        //*** Settings Class ***//
+
+        public class ControllerSettings
+        {
+            // Modify values here if necessary
+
+            public readonly KB_PlayerController controller = null;
+
+            public readonly string movementXInputString;
+            public readonly string movementYInputString;
+            public readonly string jumpingInputString;
+            public readonly string dashingInputString;
+            public readonly string fireInputString;
+
+            public readonly float moveSpeed = 2.4f;
+            public readonly float jumpForce = 8f;
+            public readonly float airControl = 0.65f;
+            public readonly LayerMask groundCheckerLayerMask = 1 << 8;
+            public readonly float dashingCooldown = 0.87f;
+            public readonly float dashingSpeed = 30;
+            public readonly float dashingDistance = 4.5f;
+
+            public readonly float joystickDeadzone = 0.8f;
+
+            public ControllerSettings() { }
+
+            public ControllerSettings(KB_PlayerController controller) { this.controller = controller; }
+
+            public ControllerSettings(int[] variableModifierIndex, dynamic[] values)
+            {
+                if (variableModifierIndex.Length != values.Length)
+                    return;
+
+                for (int index = 0; index < variableModifierIndex.Length; index++)
+                {
+                    switch (variableModifierIndex[index])
+                    {
+                        case 0:
+                            moveSpeed = values[index];
+                            break;
+                        case 1:
+                            jumpForce = values[index];
+                            break;
+                        case 2:
+                            airControl = values[index];
+                            break;
+                        case 3:
+                            groundCheckerLayerMask = values[index];
+                            break;
+                        case 4:
+                            joystickDeadzone = values[index];
+                            break;
+                        case 5:
+                            dashingCooldown = values[index];
+                            break;
+                        case 6:
+                            dashingSpeed = values[index];
+                            break;
+                        case 7:
+                            dashingDistance = values[index];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            public ControllerSettings(string[] inputStrings)
+            {
+                for (int index = 0; index < inputStrings.Length; index++)
+                {
+                    switch (index)
+                    {
+                        case 0:
+                            movementXInputString = inputStrings[index];
+                            break;
+                        case 1:
+                            movementYInputString = inputStrings[index];
+                            break;
+                        case 2:
+                            jumpingInputString = inputStrings[index];
+                            break;
+                        case 3:
+                            dashingInputString = inputStrings[index];
+                            break;
+                        case 4:
+                            fireInputString = inputStrings[index];
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+        }
+
 
         //*** Backend variables ***//
-
-        [Header("Player backend settings")]
 
         [SerializeField]
         private string movementXInputString;
@@ -29,147 +121,93 @@ namespace Knockback.Controllers
         private string dashingInputString;
         [SerializeField]
         private string fireInputString;
-        [SerializeField]
-        private float moveSpeed = 2.4f;
-        [SerializeField]
-        private float jumpForce = 24f;
-        [SerializeField]
-        private float airControl = 0.65f;
-        [SerializeField]
-        private LayerMask groundCheckerLayerMask;
-        [Range(0, 1)]
-        [SerializeField]
-        private float joystickDeadzone = 0.8f;
-        [SerializeField]
-        private bool useMouseAndKeyboard;
-        [SerializeField]
-        private Rigidbody2D cachedRigidbody = null;
-        [SerializeField]
-        private SpriteRenderer cachedSpriteRenderer = null;
 
-        private readonly float dashingCooldown = 0.87f;
-        private readonly float dashingSpeed = 30;
-        private readonly float dashingDistance = 4.5f;
-
+        [SerializeField]
         private bool canUse = false;
+        [SerializeField]
+        private bool useMouseAndKeyboard = true;
+
+        //*** Inputs ***//
+
+        //*** Mobile inputs ***//
+
+        private float _mobielXInput => CrossPlatformInputManager.GetAxisRaw(settings.movementXInputString);
+        private float _mobileYInput => CrossPlatformInputManager.GetAxisRaw(settings.movementYInputString);
+        private bool _mobileJumpInput => CrossPlatformInputManager.GetButtonDown(settings.jumpingInputString);
+        private bool _mobileDashInput => CrossPlatformInputManager.GetButtonDown(settings.dashingInputString);
+        private bool _mobileFireInput => CrossPlatformInputManager.GetButtonDown(settings.fireInputString);
+
+        //*** PC inputs (Non release mode) ***//
+
+        private float xInput => Input.GetAxisRaw(settings.movementXInputString);
+        private float yInput => Input.GetAxisRaw(settings.movementYInputString);
+        private bool jumpInput => Input.GetButtonDown(settings.jumpingInputString);
+        private bool dashInput => Input.GetButtonDown(settings.dashingInputString);
+        private bool fireInput => Input.GetButtonDown(settings.fireInputString);
+        private bool rightMouseButton => Input.GetKeyDown(KeyCode.Mouse1);
 
         //*** Reference variables ***//
-
-        private float xInput =>
-        useMouseAndKeyboard ? Input.GetAxisRaw(movementXInputString) : CrossPlatformInputManager.GetAxisRaw(movementXInputString);
-        private float yInput =>
-        useMouseAndKeyboard ? Input.GetAxisRaw(movementYInputString) : CrossPlatformInputManager.GetAxisRaw(movementYInputString);
-        private bool jumpInput =>
-        useMouseAndKeyboard ? Input.GetButtonDown(jumpingInputString) : CrossPlatformInputManager.GetButtonDown(jumpingInputString);
-        private bool dashInput =>
-        useMouseAndKeyboard ? Input.GetButtonDown(dashingInputString) : CrossPlatformInputManager.GetButtonDown(dashingInputString);
-        private bool fireInput =>
-        useMouseAndKeyboard ? Input.GetButtonDown(fireInputString) : CrossPlatformInputManager.GetButtonDown(fireInputString);
-        private bool rightMouseButton => Input.GetKeyDown(KeyCode.Mouse1);
-        public Transform weaponSlot => transform.GetChild(1);
-
-
-        //*** Variables synchronized over network ***//
-
-        //[HideInInspector]
-        //[SyncVar]
-        public bool canMove = false;
-        [HideInInspector]
-        //[SyncVar]
-        public bool canFly = false;
-        [HideInInspector]
-        //[SyncVar]
-        public float health;
-        //[HideInInspector]
-        //[SyncVar]
-        public bool isReady = false;
 
 
         //*** Cached variables ***//
 
+        private ControllerSettings settings = null;
         private KB_PlayerInventoryHandler playerInventory = null;
         private PlayerLocomotion playerLocomotion = null;
         private PlayerLookRotation playerLookRotation = null;
         private PlayerWeaponHandler playerWeaponHandler = null;
+        private SpriteRenderer cachedSpriteRenderer = null;
+        private Rigidbody2D cachedRigidbody = null;
+        public Transform cachedWeaponSlot = null;
+
+        private bool canMove = true;
+        private bool canFly = false;
+        private bool isReady = true;
+
 
         //*** Default functions ***//
 
         private void Awake()
         {
+            settings = new ControllerSettings(this);
+            settings = new ControllerSettings
+                (new string[] { movementXInputString, movementYInputString, jumpingInputString, dashingInputString, fireInputString });
+
             playerInventory = GetComponent<KB_PlayerInventoryHandler>();
             playerLocomotion = new PlayerLocomotion(this);
             playerLookRotation = new PlayerLookRotation(this);
             playerWeaponHandler = new PlayerWeaponHandler(this);
 
+            cachedWeaponSlot = transform.GetChild("_WeaponSlot");
+
             if (cachedRigidbody != null & cachedSpriteRenderer != null & playerInventory != null)
                 canUse = true;
             else
                 new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {cachedSpriteRenderer}{cachedRigidbody}{playerInventory}");
+
         }
 
         private void Update()
         {
-            if (!canUse)
+            if (!canUse || !isReady || !canMove)
                 return;
-            if (!isReady)
-                return;
-            CmdUpdateButtonStates();
-            CmdUpdateRotation();
+            playerLocomotion.Jump(jumpInput);
+            playerLocomotion.Dash(dashInput);
+            playerWeaponHandler.UseWeapon(fireInput);
+            UpdateRotation();
         }
 
         private void FixedUpdate()
         {
-            if (!canUse)
+            if (!canUse || !isReady || !canMove)
                 return;
-            if (!isReady)
-                return;
-            CmdUpdateAxisStates();
+            playerLocomotion.Move(new Vector2(xInput, yInput));
         }
 
-        private void OnDestroy()
-        {
-            StopAllCoroutines();
-        }
+        private void OnDestroy() => StopAllCoroutines();
 
-        //*** Command functions called from the client to execute methods on server ***//
+        private void UpdateRotation() => cachedWeaponSlot.rotation = playerLookRotation.GetCalculatedRotation();
 
-        /// <summary>
-        /// Server command to update axis values
-        /// </summary>
-        //[Command]
-        private void CmdUpdateAxisStates()
-        {
-            if (!canMove/* || !hasAuthority*/)
-                return;
-
-            playerLocomotion.RpcMove(new Vector2(xInput, yInput));
-        }
-
-        /// <summary>
-        /// Server command to update button states
-        /// </summary>
-        //[Command]
-        private void CmdUpdateButtonStates()
-        {
-            if (!canMove/* || !hasAuthority*/)
-                return;
-
-            playerLocomotion.RpcJump(jumpInput);
-            playerLocomotion.RpcDash(dashInput);
-            playerWeaponHandler.RpcUseWeapon(fireInput);
-        }
-
-        /// <summary>
-        /// Server command to update rotation
-        /// </summary>
-        //[Command]
-        private void CmdUpdateRotation()
-        {
-            if (!canMove/* || !hasAuthority*/)
-                return;
-
-            weaponSlot.rotation = playerLookRotation.GetCalculatedRotation();
-        }
 
         //*** Internal class ***//
 
@@ -181,9 +219,11 @@ namespace Knockback.Controllers
             public PlayerLocomotion(KB_PlayerController controller)
             {
                 this.controller = controller;
+                settings = controller.settings;
             }
 
             private KB_PlayerController controller = null;
+            private ControllerSettings settings = null;
 
             private bool isGrounded = true;
             private bool rightOrLeft = true;
@@ -191,36 +231,33 @@ namespace Knockback.Controllers
             private bool isDashing = false;
             private bool isGroundCheckerRunning = false;
 
-            //[ClientRpc]
-            public void RpcMove(Vector2 axisValue)
+            public void Move(Vector2 axisValue)
             {
                 if (!isGroundCheckerRunning)
                     controller.StartCoroutine(IsGrounded());
 
                 if (isDashing)
                     return;
-                if (Mathf.Abs(axisValue.x) < controller.joystickDeadzone && Mathf.Abs(axisValue.y) < controller.joystickDeadzone)
+                if (Mathf.Abs(axisValue.x) < settings.joystickDeadzone && Mathf.Abs(axisValue.y) < settings.joystickDeadzone)
                     return;
 
                 rightOrLeft = axisValue.x > 0 ? true : (axisValue.x < 0 ? false : rightOrLeft);
-                float airControl = controller.canFly ? 1 : controller.airControl;
+                float airControl = controller.canFly ? 1 : settings.airControl;
                 axisValue.y = controller.canFly ? axisValue.y : 0;
-                controller.transform.position += ((new Vector3(axisValue.x * airControl, axisValue.y * airControl, 0)) * controller.moveSpeed * Time.deltaTime);
+                controller.transform.position += ((new Vector3(axisValue.x * airControl, axisValue.y * airControl, 0)) * settings.moveSpeed * Time.deltaTime);
             }
 
-            //[ClientRpc]
-            public void RpcJump(bool value)
+            public void Jump(bool value)
             {
                 if (!isGroundCheckerRunning)
                     controller.StartCoroutine(IsGrounded());
                 if (!isGrounded || isDashing || !value)
                     return;
 
-                controller.cachedRigidbody.velocity = new Vector2(0, controller.jumpForce) * 5;
+                controller.cachedRigidbody.velocity = new Vector2(0, settings.jumpForce) * 5;
             }
 
-            //[ClientRpc]
-            public void RpcDash(bool value)
+            public void Dash(bool value)
             {
                 if (!isGroundCheckerRunning)
                     controller.StartCoroutine(IsGrounded());
@@ -238,7 +275,7 @@ namespace Knockback.Controllers
                 Vector3 offset = new Vector3(0f, controller.cachedSpriteRenderer.bounds.extents.y + boxSize.y, 0f);
                 while (controller.gameObject.activeInHierarchy)
                 {
-                    isGrounded = Physics2D.BoxCast(controller.transform.position - offset, boxSize, 0, Vector2.down, boxSize.y, controller.groundCheckerLayerMask).collider != null;
+                    isGrounded = Physics2D.BoxCast(controller.transform.position - offset, boxSize, 0, Vector2.down, boxSize.y, settings.groundCheckerLayerMask).collider != null;
                     yield return null;
                 }
                 isGroundCheckerRunning = false;
@@ -251,29 +288,34 @@ namespace Knockback.Controllers
                 int direction = rightOrLeft ? 1 : -1;
                 float dashingTimer = 0;
                 isDashing = true;
-                while (Vector3.Distance(controller.transform.position, initialPos) < controller.dashingDistance)
+                while (Vector3.Distance(controller.transform.position, initialPos) < settings.dashingDistance)
                 {
-                    controller.transform.position += ((new Vector3(direction, 0, 0)) * controller.dashingSpeed * Time.deltaTime);
+                    controller.transform.position += ((new Vector3(direction, 0, 0)) * settings.dashingSpeed * Time.deltaTime);
                     yield return new WaitForFixedUpdate();
                 }
                 isDashing = false;
                 yield return new WaitUntil(() =>
-                    {
-                        dashingTimer += Time.deltaTime;
-                        return dashingTimer > controller.dashingCooldown;
-                    });
+                {
+                    dashingTimer += Time.deltaTime;
+                    return dashingTimer > settings.dashingCooldown;
+                });
                 canDash = true;
             }
         }
 
+        /// <summary>
+        /// This class handles the rotation  of the weapon handle
+        /// </summary>
         internal class PlayerLookRotation
         {
             public PlayerLookRotation(KB_PlayerController controller)
             {
                 this.controller = controller;
+                settings = controller.settings;
             }
 
             KB_PlayerController controller = null;
+            ControllerSettings settings = null;
 
             private KB_CameraController localCameraController { get; set; } = null;
             private Camera localMainCamera { get; set; } = null;
@@ -367,6 +409,9 @@ namespace Knockback.Controllers
             }
         }
 
+        /// <summary>
+        /// This class handles the all weapons in the item slot
+        /// </summary>
         internal class PlayerWeaponHandler
         {
             public PlayerWeaponHandler(KB_PlayerController controller)
@@ -382,12 +427,11 @@ namespace Knockback.Controllers
             /// <summary>
             /// Rpc function call to invoke the useTtem function in the IteractableItem
             /// </summary>
-            //[ClientRpc]
-            public void RpcUseWeapon(bool value)
+            public void UseWeapon(bool value)
             {
                 if (!value)
                     return;
-                if (controller.weaponSlot.childCount == 0)
+                if (controller.cachedWeaponSlot.childCount == 0)
                     return;
                 if (activeIndex == -1)
                 {
@@ -397,11 +441,11 @@ namespace Knockback.Controllers
 
                 if (cachedItem == null)
                 {
-                    for (int index = 0; index < controller.weaponSlot.childCount; index++)
+                    for (int index = 0; index < controller.cachedWeaponSlot.childCount; index++)
                     {
-                        if (controller.weaponSlot.GetChild(index).gameObject.activeInHierarchy)
+                        if (controller.cachedWeaponSlot.GetChild(index).gameObject.activeInHierarchy)
                         {
-                            cachedItem = controller.weaponSlot.GetChild(index).gameObject;
+                            cachedItem = controller.cachedWeaponSlot.GetChild(index).gameObject;
                             Use(cachedItem.GetComponent<IUsableEntity>());
                             break;
                         }
@@ -411,11 +455,11 @@ namespace Knockback.Controllers
                 else if (!cachedItem.activeInHierarchy)
                 {
                     cachedItem = null;
-                    for (int index = 0; index < controller.weaponSlot.childCount; index++)
+                    for (int index = 0; index < controller.cachedWeaponSlot.childCount; index++)
                     {
-                        if (controller.weaponSlot.GetChild(index).gameObject.activeInHierarchy)
+                        if (controller.cachedWeaponSlot.GetChild(index).gameObject.activeInHierarchy)
                         {
-                            cachedItem = controller.weaponSlot.GetChild(index).gameObject;
+                            cachedItem = controller.cachedWeaponSlot.GetChild(index).gameObject;
                             Use(cachedItem.GetComponent<IUsableEntity>());
                             break;
                         }

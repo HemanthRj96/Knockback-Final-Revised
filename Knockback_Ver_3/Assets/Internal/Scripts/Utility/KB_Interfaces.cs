@@ -2,6 +2,15 @@
 
 namespace Knockback.Utility
 {
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public interface IPlayerController
+    {
+
+    }
+
     /// <summary>
     /// <para> Add this interface to any class that can be interacted and used </para>
     /// Compatible scripts : any weapon scripts

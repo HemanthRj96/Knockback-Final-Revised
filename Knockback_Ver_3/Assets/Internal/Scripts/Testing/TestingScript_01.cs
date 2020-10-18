@@ -1,19 +1,25 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using UnityEngine;
 
 
-public class TestingScript_01 : MonoBehaviour
+public class TestingScript_01 : NetworkBehaviour
 {
-
-    public void Construct(TestingScript_02 test)
+    [Client]
+    private void Update()
     {
-        this.test = test;
+        if (!hasAuthority)
+            return;
+
+        if(Input.GetKeyDown(KeyCode.Space))
+        CmdMove();
     }
 
-    TestingScript_02 test = null;
-
-
-    private void Start()
+    [Command]
+    private void CmdMove()
     {
-        Debug.Log($"{test.someString} : {test.someFloat}");
+        RpcMove();
     }
+
+    [ClientRpc]
+    private void RpcMove() => transform.Translate(1, 0, 0);
 }

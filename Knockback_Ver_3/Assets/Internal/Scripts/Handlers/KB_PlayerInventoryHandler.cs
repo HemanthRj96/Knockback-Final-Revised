@@ -302,13 +302,13 @@ public class KB_PlayerInventoryHandler : MonoBehaviour
     {
         GameObject item = inventorySlots[index].GetItem();
         Rigidbody2D rb = item.GetComponent<Rigidbody2D>();
-        Transform itemTransform = controller.weaponSlot;
+        //Transform itemTransform = controller.weaponSlot;
 
         rb.bodyType = RigidbodyType2D.Static;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        item.transform.SetPositionAndRotation(itemTransform.position, itemTransform.rotation);
-        item.transform.SetParent(itemTransform, true);
+        //item.transform.SetPositionAndRotation(itemTransform.position, itemTransform.rotation);
+        //item.transform.SetParent(itemTransform, true);
     }
 
     /// <summary>
