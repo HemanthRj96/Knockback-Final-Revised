@@ -27,11 +27,6 @@ namespace Knockback.Handlers
             Application.targetFrameRate = 60;
         }
 
-        public KB_PlayerController GetLocalPlayer()
-        {
-            return localPlayer;
-        }
-
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.KeypadEnter))

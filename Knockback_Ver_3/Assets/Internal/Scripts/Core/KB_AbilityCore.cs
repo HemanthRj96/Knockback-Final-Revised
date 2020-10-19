@@ -3,19 +3,20 @@ using System.Collections;
 
 namespace Knockback.Core
 {
-    public class KB_AbilityCore : MonoBehaviour
+    public class KB_AbilityCore : ScriptableObject
     {
-
-        // Use this for initialization
-        void Start()
+        public void ApplyEffect()
         {
-
+            OnStartEffect();
         }
 
-        // Update is called once per frame
-        void Update()
+        public void RemoveEffect()
         {
-
+            OnEndEffect();
         }
+
+        protected virtual void OnStartEffect() {  }
+
+        protected virtual void OnEndEffect() {  }        
     }
 }

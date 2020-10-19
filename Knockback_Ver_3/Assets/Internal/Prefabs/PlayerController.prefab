@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5797141136757949302}
   m_Layer: 8
-  m_Name: WeaponSlot
+  m_Name: _WeaponSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -42,7 +42,6 @@ GameObject:
   - component: {fileID: 8040496916692488111}
   - component: {fileID: 5797141136801982633}
   - component: {fileID: 5797141136801982632}
-  - component: {fileID: 9037867245203889673}
   m_Layer: 8
   m_Name: PlayerController
   m_TagString: Untagged
@@ -99,28 +98,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7564a6c797fc3849b6c57752e7fd7bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   movementXInputString: XInput
   movementYInputString: YInput
   jumpingInputString: Jump
   dashingInputString: Dash
   fireInputString: Fire
-  moveSpeed: 5
-  jumpForce: 3
-  airControl: 0.65
-  groundCheckerLayerMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  joystickDeadzone: 0.8
-  useMouseAndKeyboard: 1
-  cachedRigidbody: {fileID: 8040496916692488111}
-  cachedSpriteRenderer: {fileID: 5797141137498086850}
   canUse: 0
-  canMove: 1
-  canFly: 0
-  health: 0
-  isReady: 1
+  useMouseAndKeyboard: 1
+  cachedWeaponSlot: {fileID: 0}
 --- !u!114 &5797141136801982632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,22 +118,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e82e4a66f581f040946bf9701ada5b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &9037867245203889673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5797141136801982635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
 --- !u!1 &5797141137498086855
 GameObject:
   m_ObjectHideFlags: 0
@@ -161,7 +130,7 @@ GameObject:
   - component: {fileID: 5797141137498086850}
   - component: {fileID: 5797141137498086853}
   m_Layer: 8
-  m_Name: PlayerSprite
+  m_Name: _PlayerSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -3,6 +3,7 @@ using UnityStandardAssets.CrossPlatformInput;
 using System.Collections;
 using Knockback.Handlers;
 using Knockback.Utility;
+using Unity.Mathematics;
 
 namespace Knockback.Controllers
 {
@@ -26,12 +27,12 @@ namespace Knockback.Controllers
             public readonly string dashingInputString;
             public readonly string fireInputString;
 
-            public readonly float moveSpeed = 2.4f;
-            public readonly float jumpForce = 8f;
+            public readonly float moveSpeed = 10f;
+            public readonly float jumpForce = 5.5f;
             public readonly float airControl = 0.65f;
-            public readonly LayerMask groundCheckerLayerMask = 1 << 8;
-            public readonly float dashingCooldown = 0.87f;
-            public readonly float dashingSpeed = 30;
+            public readonly LayerMask groundCheckerLayerMask = 1 << 10;
+            public readonly float dashingCooldown = 0.85f;
+            public readonly float dashingSpeed = 60;
             public readonly float dashingDistance = 4.5f;
 
             public readonly float joystickDeadzone = 0.8f;
@@ -127,6 +128,9 @@ namespace Knockback.Controllers
         [SerializeField]
         private bool useMouseAndKeyboard = true;
 
+        public GameObject impactPoint = null;
+        public float adjustments;
+
         //*** Inputs ***//
 
         //*** Mobile inputs ***//
@@ -158,7 +162,7 @@ namespace Knockback.Controllers
         private PlayerWeaponHandler playerWeaponHandler = null;
         private SpriteRenderer cachedSpriteRenderer = null;
         private Rigidbody2D cachedRigidbody = null;
-        public Transform cachedWeaponSlot = null;
+        private Transform cachedWeaponSlot = null;
 
         private bool canMove = true;
         private bool canFly = false;
@@ -179,12 +183,13 @@ namespace Knockback.Controllers
             playerWeaponHandler = new PlayerWeaponHandler(this);
 
             cachedWeaponSlot = transform.GetChild("_WeaponSlot");
+            cachedSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            cachedRigidbody = GetComponent<Rigidbody2D>();
 
             if (cachedRigidbody != null & cachedSpriteRenderer != null & playerInventory != null)
                 canUse = true;
             else
                 new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {cachedSpriteRenderer}{cachedRigidbody}{playerInventory}");
-
         }
 
         private void Update()
@@ -208,6 +213,9 @@ namespace Knockback.Controllers
 
         private void UpdateRotation() => cachedWeaponSlot.rotation = playerLookRotation.GetCalculatedRotation();
 
+        public void ModifySettings(int[] index, dynamic[] values) => settings = new ControllerSettings(index, values);
+
+        public ControllerSettings GetSettings() => settings;
 
         //*** Internal class ***//
 
@@ -230,6 +238,7 @@ namespace Knockback.Controllers
             private bool canDash = true;
             private bool isDashing = false;
             private bool isGroundCheckerRunning = false;
+            public bool stopDash = false;
 
             public void Move(Vector2 axisValue)
             {
@@ -284,21 +293,55 @@ namespace Knockback.Controllers
 
             private IEnumerator StartDash()
             {
-                Vector3 initialPos = controller.transform.position;
-                int direction = rightOrLeft ? 1 : -1;
-                float dashingTimer = 0;
                 isDashing = true;
-                while (Vector3.Distance(controller.transform.position, initialPos) < settings.dashingDistance)
+
+                int direction = rightOrLeft ? 1 : -1;
+                Vector2 initialPos = controller.transform.position;
+                Vector2 newPos;
+                float elapsedTime = 0;
+                float totalDashDistance = 0;
+                const float errorMargin = 0.01f;
+                LayerMask playerIgnoreMask = 1 << 8;
+
+                RaycastHit2D hit = Physics2D.Raycast(initialPos, new Vector2(direction, 0), settings.dashingDistance, ~playerIgnoreMask);
+                if (hit.collider)
                 {
-                    controller.transform.position += ((new Vector3(direction, 0, 0)) * settings.dashingSpeed * Time.deltaTime);
-                    yield return new WaitForFixedUpdate();
+                    Vector2 offset = new Vector2(direction * controller.cachedSpriteRenderer.bounds.extents.x, 0);
+                    totalDashDistance = Vector2.Distance(controller.transform.position, hit.point - offset);
                 }
+                else
+                    totalDashDistance = settings.dashingDistance;
+
+                while (true)
+                {
+                    float currentDistance = 0;
+                    Vector2 offset;
+                    newPos = new Vector2(
+                                            controller.transform.position.x + (settings.dashingSpeed * Time.deltaTime * direction),
+                                            controller.transform.position.y
+                                        );
+                    currentDistance = Vector2.Distance(newPos, initialPos);
+
+                    if (currentDistance > totalDashDistance)
+                    {
+                        currentDistance -= totalDashDistance;
+                        offset = new Vector2(currentDistance + errorMargin, 0);
+                        controller.transform.position = newPos - (offset * direction);
+                        break;
+                    }
+
+                    controller.transform.position = newPos;
+                    yield return null;
+                }
+
                 isDashing = false;
+
                 yield return new WaitUntil(() =>
                 {
-                    dashingTimer += Time.deltaTime;
-                    return dashingTimer > settings.dashingCooldown;
+                    elapsedTime += Time.deltaTime;
+                    return elapsedTime > settings.dashingCooldown;
                 });
+
                 canDash = true;
             }
         }

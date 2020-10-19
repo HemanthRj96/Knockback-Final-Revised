@@ -131,9 +131,9 @@ namespace Knockback.Controllers
 
             if (TryGettingPlayerHandler())
             {
-                if (KB_PlayerHandler.instance.GetLocalPlayer())
+                if (KB_PlayerHandler.instance.localPlayer)
                 {
-                    SetLocalTarget(KB_PlayerHandler.instance.GetLocalPlayer().gameObject);
+                    SetLocalTarget(KB_PlayerHandler.instance.localPlayer.gameObject);
                     canUse = true;
                 }
             }
