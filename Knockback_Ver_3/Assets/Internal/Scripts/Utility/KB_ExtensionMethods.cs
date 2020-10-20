@@ -1,6 +1,4 @@
-﻿using Mirror;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Knockback.Utility
@@ -35,8 +33,6 @@ namespace Knockback.Utility
             List<Transform> children = new List<Transform>();
             for (int index = 0; index < transform.childCount; index++) { children.Add(transform.GetChild(index)); }
             return children.ToArray();
-        }
-
-        
+        }        
     }
 }

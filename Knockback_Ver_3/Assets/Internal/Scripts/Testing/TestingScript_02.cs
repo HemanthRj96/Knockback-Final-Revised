@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 
 
-public class TestingScript_02
+public class TestingScript_02 : MonoBehaviour
 {
-    public string someString;
-    public float someFloat;
-
+    
 }

@@ -28,4 +28,10 @@
         type_2,
         type_3
     }
+
+    public enum AbilityType
+    {
+        consumable,
+        nonConsumable
+    }
 }
