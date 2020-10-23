@@ -1,0 +1,69 @@
+﻿
+**----ALL SCRIPTS----**
+
+CONTROLLERS:-
+
+1. CameraController
+2. PlayerController
+
+CORE:-
+
+1.  AbilityAuthenticatorCore
+2.  AbilityContainerCore
+3.  AbilityCore
+4.  AbilityInjectorCore
+5.  BulletCore
+6.  GunCore
+7.  InteractableEntityCore
+8.  PlayerKnockbackCore
+9.  SplashDamageCore
+10. ThrowableCore
+
+DEERIVED:-
+
+1.  ConsumableAbilityContainer
+2.  HandGrenadde
+3.  Mine
+4.  Molotov
+5.  NonConsumableAbilityCore
+6.  SpeedBooster
+7.  StickyGrenade
+
+HANDLERS:-
+
+1.  AbilityHandler
+2.  CanvasGroupHandler
+3.  DataBaseHandler
+4.  DataPersistenceHandler
+5.  EventHandler
+6.  GameHandler
+7.  JoystickSaveHandler
+8.  LevelHandler
+9.  PlayerDynamicStateHandler
+10. PlayerHandler
+11. PlayerInventoryHandler
+12. PlayerStaticsHandler
+13. PoolHandler
+14. ReferenceHandler
+15. ResourceHandler
+
+NETWORK:-
+
+1.  NetworkedPlayerController
+
+SCRIPTABLES:-
+
+1. GunData
+
+STANDALONE:-
+
+1.  GenericButtonBinder
+2.  ItemPickup
+3.  ItemSlot
+
+UTILITY:-
+
+1.  Enums
+2.  ExtensionMethods
+3.  Interfaces
+4.  Log

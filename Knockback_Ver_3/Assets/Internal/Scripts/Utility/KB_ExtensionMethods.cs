@@ -33,6 +33,14 @@ namespace Knockback.Utility
             List<Transform> children = new List<Transform>();
             for (int index = 0; index < transform.childCount; index++) { children.Add(transform.GetChild(index)); }
             return children.ToArray();
-        }        
+        }
+
+        public static int GenerateId<T>(this T obj, int length = 5)
+        {
+            length = Mathf.Clamp(length, 3, 8);
+            int minValue = (int)Mathf.Pow(10, length - 1);
+            int maxValue = (minValue * 10) - 1;
+            return Random.Range(minValue, maxValue);
+        }
     }
 }

@@ -30,10 +30,9 @@ namespace Knockback.Handlers
     [System.Serializable]
     public struct PlayerSaveData
     {
-        private float value;
-
-        public void SetValue(float value) { this.value = value; }
-        public float GetValue() { return value; }
+        private string value;
+        public void SetValue(string value) => this.value = value;
+        public string GetValue() => value;
 
     }
 

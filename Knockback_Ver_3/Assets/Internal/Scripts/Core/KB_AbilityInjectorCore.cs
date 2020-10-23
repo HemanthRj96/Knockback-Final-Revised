@@ -1,12 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.Collections;
 
 namespace Knockback.Core
 {
     public class KB_AbilityInjectorCore : MonoBehaviour
     {
+        //todo: Commenting
 
-        public string injectorId { get; private set; } = "";        
+        [SerializeField]
+        private _Ability ability;
+
+        private string _id = "";
+        public string injectorId { get { return _id; } private set { _id = value; } }
+
 
         public string GetUniqueId()
         {
@@ -44,10 +52,6 @@ namespace Knockback.Core
             injectorId = id;
         }
 
-        // Always register the ability injector on awake or start methods
-
-        
-        // All injection logic happens here
-
+        public _Ability GetAbility() => ability;
     }
 }

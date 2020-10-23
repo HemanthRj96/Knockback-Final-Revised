@@ -15,7 +15,7 @@ namespace Knockback.Handlers
             fileHandle.Close();
         }
 
-        public static void SaveData<T>(string filePath, T data)
+        public static void SaveData<T>(string filePath, T data) where T : class
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             string targetFilepath = Application.persistentDataPath + filePath;
@@ -29,7 +29,7 @@ namespace Knockback.Handlers
             fileHandle.Close();
         }
 
-        public static void LoadData<T>(string filePath, out T data)
+        public static void LoadData<T>(string filePath, out T data) where T : class
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             string targetFilepath = Application.persistentDataPath + filePath;

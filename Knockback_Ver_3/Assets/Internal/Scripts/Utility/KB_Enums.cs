@@ -34,4 +34,36 @@
         consumable,
         nonConsumable
     }
+
+    public enum UICanvasButtons
+    {
+        defaultNull,
+        start,
+        pause,
+        exit,
+        settings,
+        sound,
+        graphics,
+        playerProfile,
+        button_1,
+        button_2,
+        button_3,
+        button_4,
+        button_5
+    }
+
+    public enum UICanvasGroups
+    {
+        defaultNull,
+        startMenu,
+        pauseMenu,
+        settingsMenu,
+        exitMenu,
+        miscMenu_1,
+        miscMenu_2,
+        miscMenu_3,
+        miscMenu_4
+    }
+
+
 }

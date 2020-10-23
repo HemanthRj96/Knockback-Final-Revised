@@ -37,7 +37,7 @@ namespace Knockback.Handlers
         }
 
         /// <summary>
-        /// Method to add events; If the method tag already exists then the method is automatically subscirbed to the listener
+        /// Method to add events; If the method tag already exists then the method is automatically subscribed to the listener
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="_event"></param>

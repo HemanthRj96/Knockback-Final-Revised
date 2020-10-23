@@ -4,53 +4,39 @@ using UnityEngine;
 
 namespace Knockback.Core
 {
-    public class KB_AbilityContainerCore : ScriptableObject
+    public abstract class KB_AbilityContainerCore : ScriptableObject
     {
-        public virtual void ActivateContainerAbility(int containerId, bool autoDeactivate = true) { }
+        public virtual void ActivateAbilityFromLocal(int containerId) { }
 
-        public virtual void ActivateContainerAbility(string containerTag, bool autoDeactivate = true) { }
+        public virtual void DeactivateAbilityFromLocal(int containerId) { }
 
-        public virtual void DeactivateContainerAbility(int containerId) { }
+        protected void AbilityActivator(_Ability _abilityContainer) => _abilityContainer.abilities.ForEach((ability) => ability.RemoveEffect());
 
-        public virtual void DeactivateContainerAbility(string containerTag) { }
-
-
-        protected void AbilityActivater(AbilityContainer container)
-        {
-            foreach (KB_AbilityCore ability in container.unitAbilities)
-            {
-                ability.ApplyEffect();
-            }
-        }
-
-        protected void AbilityDeactivator(AbilityContainer container)
-        {
-            foreach (KB_AbilityCore ability in container.unitAbilities)
-            {
-                ability.RemoveEffect();
-            }
-        }
-
-
+        protected void AbilityDeactivator(_Ability _abilityContainer) => _abilityContainer.abilities.ForEach((ability) => ability.RemoveEffect());
     }
 
     [System.Serializable]
-    public struct AbilityContainer
+    public class _Ability
     {
-        public int containerId;
-        public string containerTag;
-        public List<KB_AbilityCore> unitAbilities;        
-        public float abilityDuration;
-        public float abilityCooldown;
+        [HideInInspector]
+        public bool isUnlocked;
+        [HideInInspector]
+        public bool isActivated;
+        //[HideInInspector]
+        public int id;
+        public List<KB_AbilityCore> abilities;        
+        public float duration;
+        public float cooldown;
 
-        public AbilityContainer(int containerId, string containerTag, List<KB_AbilityCore> unitAbilities, float abilityDuration = 5, float abilityCooldown = 25)
+        public void SetId(int id)
         {
-            this.containerId = containerId;
-            this.containerTag = containerTag;
-            this.unitAbilities = unitAbilities;
-            this.abilityDuration = abilityDuration;
-            this.abilityCooldown = abilityCooldown;
+            if (this.id == 0)
+                this.id = id;
         }
+        public void Unlock() => isUnlocked = true;
+        public void Lock() => isUnlocked = false;
+        public void Activate() => isActivated = true;
+        public void Deactivate() => isActivated = false;
     }
 
 }

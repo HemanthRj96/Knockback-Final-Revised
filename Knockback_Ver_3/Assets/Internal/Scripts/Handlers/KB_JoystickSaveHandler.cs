@@ -103,7 +103,6 @@ namespace Knockback.Handlers
 
         private void SaveSettings()
         {
-            dataBaseReference.GetPlayerData().SetValue(45);
             KB_DataPersistenceHandler.SaveData(KB_DatabaseHandler.GetTargetDirectory(), dataBaseReference);
         }
     }
