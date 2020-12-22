@@ -65,5 +65,11 @@
         miscMenu_4
     }
 
+    public enum InputType
+    { 
+        defaultNull,
+        MouseAndKeyboard,
+        Touch
+    }
 
 }

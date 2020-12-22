@@ -42,10 +42,11 @@ HANDLERS:-
 9.  PlayerDynamicStateHandler
 10. PlayerHandler
 11. PlayerInventoryHandler
-12. PlayerStaticsHandler
-13. PoolHandler
-14. ReferenceHandler
-15. ResourceHandler
+12. PlayerProgressHandler
+13. PlayerStaticsHandler
+14. PoolHandler
+15. ReferenceHandler
+16. ResourceHandler
 
 NETWORK:-
 

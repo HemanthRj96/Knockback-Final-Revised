@@ -3,6 +3,7 @@ using Knockback.Core;
 using System.Collections.Generic;
 using Knockback.Controllers;
 using Knockback.Utility;
+using Knockback.Helpers;
 
 namespace Knockback.Derived
 {
@@ -69,9 +70,13 @@ namespace Knockback.Derived
         {
             if (source == null)
                 return;
-            KB_PlayerInventoryHandler inventory;
-            if (source.TryGetComponent(out inventory))
-                inventory.RemoveItemFromInventory(gameObject);
+            KB_InventoryHandler inventoryHandler = null;
+            KB_PickupManager pickupManager = GetComponent<KB_PickupManager>();
+            if (source.GetComponent<KB_PlayerController>())
+            {
+                inventoryHandler = source.GetComponent<KB_PlayerController>().inventoryHandler;
+                inventoryHandler.RemoveItemFromInventory(pickupManager.GetItemContainer(), false);
+            }
         }
     }
 }

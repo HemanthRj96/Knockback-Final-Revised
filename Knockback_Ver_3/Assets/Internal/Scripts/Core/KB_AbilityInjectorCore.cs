@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Collections;
+using Knockback.Helpers;
 
 namespace Knockback.Core
 {
@@ -10,7 +11,7 @@ namespace Knockback.Core
         //todo: Commenting
 
         [SerializeField]
-        private _Ability ability;
+        private KB_Ability ability;
 
         private string _id = "";
         public string injectorId { get { return _id; } private set { _id = value; } }
@@ -52,6 +53,6 @@ namespace Knockback.Core
             injectorId = id;
         }
 
-        public _Ability GetAbility() => ability;
+        public KB_Ability GetAbility() => ability;
     }
 }

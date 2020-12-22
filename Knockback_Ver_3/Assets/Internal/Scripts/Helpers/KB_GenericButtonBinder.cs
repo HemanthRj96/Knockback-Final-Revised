@@ -4,7 +4,7 @@ using Knockback.Utility;
 using Knockback.Handlers;
 
 
-namespace Knockback.Standalone
+namespace Knockback.Helpers
 {
     [RequireComponent( typeof(Button))]
     public class KB_GenericButtonBinder : MonoBehaviour

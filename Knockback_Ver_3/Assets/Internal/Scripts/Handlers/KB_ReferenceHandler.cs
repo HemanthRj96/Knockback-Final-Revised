@@ -1,6 +1,4 @@
-﻿using Knockback.Utility;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Knockback.Handlers
@@ -32,7 +30,12 @@ namespace Knockback.Handlers
         /// Use this function to add object reference to the world reference handler
         /// </summary>
         /// <param name="value">The class reference you need to store</param>
-        public static void Add(Object value, string tag) { container.Add(new ObjectContainer(value, tag)); }
+        public static void Add(Object value, string tag)
+        {
+            if (DuplicateCheck(tag))
+                return;
+            container.Add(new ObjectContainer(value, tag));
+        }
 
         /// <summary>
         /// Removes reference of the given value
@@ -138,6 +141,19 @@ namespace Knockback.Handlers
                 }
             }
             return flag;
+        }
+
+        private static bool DuplicateCheck(string tag)
+        {
+            foreach (var temp in container)
+            {
+                if (temp.IsEqual(tag))
+                {
+                    Debug.LogWarning($"Duplicate found!! With tag name : {tag}");
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

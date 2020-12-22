@@ -1,4 +1,5 @@
 ﻿using Knockback.Handlers;
+using Knockback.Helpers;
 using Knockback.Utility;
 using System.Collections.Generic;
 using System.Resources;
@@ -13,8 +14,8 @@ namespace Knockback.Core
         [Header("Non consumable backend settings")]
         [Space]
 
-        public List<_Ability> _nonConsumableAbilities = new List<_Ability>();
-        private List<_Ability> _cachedActiveAbilities = new List<_Ability>();
+        public List<KB_Ability> _nonConsumableAbilities = new List<KB_Ability>();
+        private List<KB_Ability> _cachedActiveAbilities = new List<KB_Ability>();
 
         private void Awake()
         {
@@ -89,16 +90,16 @@ namespace Knockback.Core
         /// <summary>
         /// Returns all active abilities
         /// </summary>
-        public List<_Ability> GetAllActiveAbilities() => _cachedActiveAbilities;
+        public List<KB_Ability> GetAllActiveAbilities() => _cachedActiveAbilities;
 
-        private void ActivateAbility(_Ability ability) => AbilityActivator(ability);
+        private void ActivateAbility(KB_Ability ability) => AbilityActivator(ability);
         
-        private void DeactivateAbility(_Ability ability) => AbilityDeactivator(ability);
+        private void DeactivateAbility(KB_Ability ability) => AbilityDeactivator(ability);
 
         private bool ContainsId(int id, out int index)
         {
             int tempIndex = 0;
-            foreach (_Ability ability in _nonConsumableAbilities)
+            foreach (KB_Ability ability in _nonConsumableAbilities)
             {
                 if (ability.id == id)
                 {

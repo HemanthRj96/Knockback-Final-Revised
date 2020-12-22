@@ -4,7 +4,7 @@ using Knockback.Utility;
 
 namespace Knockback.Handlers
 {
-    public class KB_PlayerDynamicStateHandler : MonoBehaviour, IDamage
+    public class KB_PlayerDynamicStateHandler : IDamage
     {
         //todo: Requires more refactoring
         //todo: Network synchronization

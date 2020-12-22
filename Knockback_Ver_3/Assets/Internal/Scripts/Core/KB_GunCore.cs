@@ -157,7 +157,7 @@ namespace Knockback.Core
                 gunRecoil = gunData.gunRecoil;
                 cameraShakeIntensity = gunData.cameraShakeIntensity;
                 poolSize = gunData.bulletPoolSize;
-                CreateBulletPool(gunData.bulletPrefab);
+                //CreateBulletPool(gunData.bulletPrefab);
             }
 
             ~Shooter()

@@ -1,71 +1,123 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+using System.Media;
 
 namespace Knockback.Handlers
 {
-    public class KB_ResourceHandler : MonoBehaviour
+    public static class KB_ResourceHandler
     {
-        //todo: Implemtn the correct logic here
-        //todo: Redsign the resource file structure
+        public static ResourceCollections collectionHandle;
+        public static bool isResourceLoaded = false;
 
-        private static ResourceCollections collectionHandle;
         public static void LoadReasourceCollections() { collectionHandle = new ResourceCollections(); }
-        public static ResourceCollections GetResourceCollectionHandle() { return collectionHandle; }
-        public static bool resourceCollectionState { get; private set; } = false;
 
         public class ResourceCollections
         {
+            public ResourceCollections() { LoadCollections(); }
+
+            /// <summary>
+            /// Player prefab
+            /// </summary>
             private GameObject playerPrefab = null;
-            private Dictionary<string, GameObject> UIObjectCollections = new Dictionary<string, GameObject>();
-            private Dictionary<string, ScriptableObject> scriptableObjectCollections = new Dictionary<string, ScriptableObject>();
-            private Dictionary<string, Sprite> spriteCollections = new Dictionary<string, Sprite>();
-            private Dictionary<string, GameObject[]> spawnPointCollections = new Dictionary<string, GameObject[]>();
-            private Dictionary<string, GameObject> gunIconCollections = new Dictionary<string, GameObject>();
+            /// <summary>
+            /// Collection of enemy prefabs
+            /// </summary>
+            private Dictionary<string, GameObject> enemyPrefabCollection = new Dictionary<string, GameObject>();
+            /// <summary>
+            /// Collections of all the sprites in the game
+            /// </summary>
+            private Dictionary<string, Sprite> spriteCollection = new Dictionary<string, Sprite>();
+            /// <summary>
+            /// Collection of all the animators used in the game
+            /// </summary>
+            private Dictionary<string, Animator> animatorCollection = new Dictionary<string, Animator>();
+            /// <summary>
+            /// Collections of all the scriptable objects in the game / these are not relevant to the gameplay itself
+            /// </summary>
+            private Dictionary<string, ScriptableObject> scriptableObjectCollection = new Dictionary<string, ScriptableObject>();
+            /// <summary>
+            /// Collections of all the prefabs in the game
+            /// </summary>
+            private Dictionary<string, GameObject> prefabCollection = new Dictionary<string, GameObject>();
+            /// <summary>
+            /// Collection of all the UIObjects
+            /// </summary>
+            private Dictionary<string, GameObject> UIObjectCollection = new Dictionary<string, GameObject>();
+            /// <summary>
+            /// Collection of all the Sounds
+            /// </summary>
+            private Dictionary<string, AudioClip> audioCollection = new Dictionary<string, AudioClip>();
+            /// <summary>
+            /// Collection of all spawnpoint collections
+            /// </summary>
+            private Dictionary<string, Dictionary<string, GameObject>> spawnpointCollectionList = new Dictionary<string, Dictionary<string, GameObject>>();
 
             private const int SpawnpointCollectionCount = 1;
-            public ResourceCollections() { LoadCollections(); }
+
             private void LoadCollections()
             {
-                int index = 0;
-                resourceCollectionState = false;
+                if (isResourceLoaded)
+                    return;
+                //Sprite collection loader
+                LoadResourcesFromPath("Sprites", out Sprite[] sprites);
+                CreateCollection(sprites, out spriteCollection);
+                //Animator collection loader
+                LoadResourcesFromPath("Animators", out Animator[] animators);
+                CreateCollection(animators, out animatorCollection);
+                //ScriptableObject collection loader
+                LoadResourcesFromPath("Scriptables", out ScriptableObject[] scriptableObjects);
+                CreateCollection(scriptableObjects, out scriptableObjectCollection);
+                //Enemy prefab collection loader
+                LoadResourcesFromPath("OtherPrefabs/EnemyPrefabs", out GameObject[] otherPrefabs);
+                CreateCollection(otherPrefabs, out enemyPrefabCollection);
+                //Prefab collection loader
+                LoadResourcesFromPath("Prefabs", out GameObject[] prefabs);
+                CreateCollection(prefabs, out prefabCollection);
+                //UIObjects collection loader
+                LoadResourcesFromPath("UIObjects", out GameObject[] UIObjects);
+                CreateCollection(UIObjects, out UIObjectCollection);
+                //Sound collection loader
+                LoadResourcesFromPath("Sounds", out AudioClip[] sounds);
+                CreateCollection(sounds, out audioCollection);
+                //Spawnpoint collection loader
+                for (int index = 0; index < SpawnpointCollectionCount; index++)
+                {
+                    LoadResourcesFromPath($"Spawnpoints/Set_{index}", out GameObject[] spawnpoints);
+                    CreateCollection(spawnpoints, out Dictionary<string, GameObject> spawnpointcollection);
+                    spawnpointCollectionList.Add($"Set_{index}", spawnpointcollection);
+                }
 
-                // Player loader
-                playerPrefab = Resources.Load<GameObject>("GameObjects/Player/BasePlayer");
-
-                // GameObjects loader
-                GameObject[] gameObjects = Resources.LoadAll<GameObject>("GameObjects/UI");
-                foreach (var gameObject in gameObjects)
-                    UIObjectCollections.Add(gameObject.name, gameObject);
-
-                // Scriptable loader
-                ScriptableObject[] scriptableObjects = Resources.LoadAll<ScriptableObject>("Scriptables");
-                foreach (var scriptableObject in scriptableObjects)
-                    scriptableObjectCollections.Add(scriptableObject.name, scriptableObject);
-
-                // Sprite loader
-                Sprite[] sprites = Resources.LoadAll<Sprite>("Sprites");
-                foreach (var sprite in sprites)
-                    spriteCollections.Add(sprite.name, sprite);
-
-                // Spawnpoint loader
-                for (index = 0; index < SpawnpointCollectionCount; index++)
-                    spawnPointCollections.Add($"Set_{index}", Resources.LoadAll<GameObject>($"SpawnPoints/Set_{index}"));
-                /*
-                                // Gun icon loader
-                                GameObject[] gunIcons = Resources.LoadAll<GameObject>("GameObjects/Icons");
-                                foreach (var gunIcon in gunIcons)
-                                    gunIconCollections.Add(gunIcon.name, gunIcon);
-                */
-                resourceCollectionState = true;
+                isResourceLoaded = true;
             }
 
-            public GameObject GetPlayerPrefab() { return playerPrefab; }
-            public GameObject GetUIObjectFromTag(string tag) { return UIObjectCollections[tag]; }
-            public ScriptableObject GetScriptableObjectFromTag(string tag) { return scriptableObjectCollections[tag]; }
-            public Sprite GetSpriteFromTag(string tag) { return spriteCollections[tag]; }
-            public GameObject[] GetSpawnpointFromSet(string tag) { return spawnPointCollections[tag]; }
-            public GameObject GetIconFromTag(string tag) { return gunIconCollections[tag]; }
+            private void LoadResourcesFromPath<T>(string path, out T[] outData) where T : class
+            {
+                List<T> sortedObjects = new List<T>();
+                Object[] unsortedEntities = Resources.LoadAll(path);
+
+                foreach (Object entity in unsortedEntities)
+                    if (entity is T)
+                        sortedObjects.Add(entity as T);
+
+                outData = sortedObjects.ToArray();
+            }
+
+            private void CreateCollection<T>(T[] inData, out Dictionary<string, T> outCollection)
+            {
+                outCollection = new Dictionary<string, T>();
+                foreach (T data in inData)
+                    outCollection.Add(data.ToString(), data);
+            }
+
+            public GameObject GetPlayerPrefab() => playerPrefab;
+            public Dictionary<string, Sprite> GetSpriteCollection() => spriteCollection;
+            public Dictionary<string, Animator> GetAnimatorCollection() => animatorCollection;
+            public Dictionary<string, ScriptableObject> GetScriptableObjectCollection() => scriptableObjectCollection;
+            public Dictionary<string, GameObject> GetPrefabCollection() => prefabCollection;
+            public Dictionary<string, GameObject> GetEnemyPrefabCollection() => enemyPrefabCollection;
+            public Dictionary<string, AudioClip> GetSoundCollection() => audioCollection;
+            public Dictionary<string, GameObject> GetUIGameObjectCollection() => UIObjectCollection;
+            public Dictionary<string, GameObject> GetSpawnpointCollectionFromSet(string collectionSet) => spawnpointCollectionList[collectionSet];
         }
     }
 }

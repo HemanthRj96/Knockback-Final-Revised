@@ -7,7 +7,7 @@ using Mirror;
 using Knockback.Utility;
 
 
-namespace Knockback.Standalone
+namespace Knockback.Helpers
 {
     public class KB_ItemPickup : MonoBehaviour
     {
@@ -28,10 +28,13 @@ namespace Knockback.Standalone
         //[SyncVar]
         private bool isPicked = false;
 
-        private KB_PlayerInventoryHandler playerInventory;
+        private KB_InventoryHandler inventoryHandler = null;
+        private KB_PickupManager pickupManager = null;
 
-        //[Command]
-        public void CmdEnableItem(bool isActive, bool isPicked = true, bool canInteract = false)
+
+        private void Awake() => pickupManager = gameObject.GetComponent<KB_PickupManager>();
+
+        public void EnableItem(bool isActive, bool isPicked = true, bool canInteract = false)
         {
             this.canInteract = canInteract;
             this.isPicked = isPicked;
@@ -39,8 +42,7 @@ namespace Knockback.Standalone
             GetComponent<IUsableEntity>().canUse = true;
         }
 
-        //[Command]
-        public void CmdDisableItem(bool isActive, bool isPicked = true, bool canInteract = false)
+        public void DisableItem(bool isActive, bool isPicked = true, bool canInteract = false)
         {
             this.canInteract = canInteract;
             this.isPicked = isPicked;
@@ -55,8 +57,8 @@ namespace Knockback.Standalone
                 return;
             if (collider.GetComponent<KB_PlayerController>())
             {
-                playerInventory = collider.GetComponent<KB_PlayerInventoryHandler>();
-                playerInventory.TryPickup(gameObject);
+                inventoryHandler = collider.GetComponent<KB_PlayerController>().inventoryHandler;
+                inventoryHandler.TryPickup(pickupManager.GetItemContainer());
             }
         }
 
@@ -66,8 +68,8 @@ namespace Knockback.Standalone
                 return;
             if (collider.GetComponent<KB_PlayerController>())
             {
-                playerInventory = collider.GetComponent<KB_PlayerInventoryHandler>();
-                playerInventory.TryRemoveFromPickup(gameObject);
+                inventoryHandler = collider.GetComponent<KB_PlayerController>().inventoryHandler;
+                inventoryHandler.RemovePickup(pickupManager.GetItemContainer());
             }
         }
     }
