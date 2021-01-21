@@ -1,41 +1,39 @@
 ﻿using Knockback.Controllers;
-using Knockback.Core;
 using Knockback.Handlers;
+using Knockback.Scriptables;
+using Knockback.Utility;
 using UnityEngine;
 
 namespace Knockback.Derived
 {
-    [CreateAssetMenu(fileName = "KB_Speedbooster", menuName = "Player Abilities/KB_Speedbooster")]
-    public class KB_Speedbooster : KB_AbilityCore
+    [CreateAssetMenu(fileName = "SpeedBooster", menuName = "Scriptables/SpeedBooster")]
+    public class KB_Speedbooster : KB_AbilityBlueprint
     {
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
+
         [Header("Speedbooster backend")]
         [Space]
-
-        [Range(-500, 500)]
-        [Tooltip("The value here is in percentage")]
         [SerializeField] private float percentageModifier = 0;
-        [SerializeField] private float absoluteValue = 0;
-        [SerializeField] private bool usePercentage = false;
 
-        private KB_PlayerController controller = null;
+        //** --PRIVATE ATTRIBUTES--
+
         private float cachedValue = 0;
+        private PlayerBackendSettingType[] settingType = new PlayerBackendSettingType[] { PlayerBackendSettingType.moveSpeed };
 
-        protected override void OnStartEffect()
+
+        //** --METHODS--
+        //** --OVERRIDED METHODS--
+
+        protected override void OnStartAbility()
         {
-            if (KB_PlayerHandler.instance == null || KB_PlayerHandler.instance.localPlayer == null)
-                return;
-            controller = KB_PlayerHandler.instance.localPlayer;
             cachedValue = controller.GetSettings().moveSpeed;
-
-            if (usePercentage)
-                controller.ModifySettings(new int[] { 0 }, new dynamic[] { cachedValue * percentageModifier });
-            else
-                controller.ModifySettings(new int[] { 0 }, new dynamic[] { absoluteValue });
+            controller.ModifySettings(settingType, new dynamic[] { cachedValue * percentageModifier / 100 });
         }
 
-        protected override void OnEndEffect()
+        protected override void OnEndAbility()
         {
-            controller.ModifySettings(new int[] { 0 }, new dynamic[] { cachedValue });
+            controller.ModifySettings(settingType, new dynamic[] { cachedValue });
         }
     }
 }

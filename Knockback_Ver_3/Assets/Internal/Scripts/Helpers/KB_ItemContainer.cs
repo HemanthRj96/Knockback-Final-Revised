@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace Knockback.Helpers
 {
@@ -7,9 +6,10 @@ namespace Knockback.Helpers
     {
         private GameObject item = null;
         private GameObject iconPrefab = null;
-        private KB_PickupManager pickupManager = null;
+        private GameObject itemUser = null;
+        private KB_ItemInteractor pickupManager = null;
 
-        public void SetupContainer(KB_PickupManager pickupManager, GameObject item, GameObject iconPrefab)
+        public void SetupContainer(KB_ItemInteractor pickupManager, GameObject item, GameObject iconPrefab)
         {
             this.pickupManager = pickupManager;
             this.item = item;
@@ -18,6 +18,9 @@ namespace Knockback.Helpers
 
         public GameObject GetItem() => item;
         public GameObject GetIconPrefab() => iconPrefab;
-        public KB_PickupManager GetPickupManager() => pickupManager;
+        public KB_ItemInteractor GetPickupManager() => pickupManager;
+        public GameObject GetItemUser() => itemUser;
+        public void SetItemUser(GameObject itemUser) => this.itemUser = itemUser;
+
     }
 }

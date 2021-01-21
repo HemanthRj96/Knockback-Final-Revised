@@ -13,8 +13,6 @@ namespace Knockback.Helpers
         public KB_InventoryHandler() { }
         public KB_InventoryHandler(KB_PlayerController controlledActor) => this.controlledActor = controlledActor;
 
-        #region --Attributes--
-
         private const int _INVENTORY_SIZE = 4;
 
         //** Player controller
@@ -34,11 +32,6 @@ namespace Knockback.Helpers
         private bool canUse = false;
         private bool bootstrapped = false;
         private int bootstrapLoopCounter = 0;
-
-        #endregion --Attributes--
-
-        #region --Public Methods--        
-
 
         /// <summary>
         /// Method to initialize pickup and inventory slots
@@ -196,12 +189,6 @@ namespace Knockback.Helpers
             ItemRemover(targetSlot.slotId);
         }
 
-
-        #endregion --Public Methods--
-
-        #region --Private Method--
-
-
         /// <summary>
         /// This is the function invoked by the inventory slots if the player interacts with it
         /// </summary>
@@ -246,6 +233,8 @@ namespace Knockback.Helpers
         {
             if (pickupSlot.GetContainer() == null)
                 return;
+
+            pickupSlot.GetContainer().SetItemUser(controlledActor.gameObject);
 
             int emptyIndex = GetEmptySlot();
             currentIndex = GetCurrentlySelectedSlot();
@@ -300,9 +289,16 @@ namespace Knockback.Helpers
             DetachItem(inventorySlots[targetIndex].GetContainer());
             DestroyChildIcon(inventorySlots[targetIndex]);
             RemoveItemRoutine(inventorySlots[targetIndex]);
+            inventorySlots[targetIndex].GetContainer().SetItemUser(null);
             inventorySlots[targetIndex].ResetItemSlot();
         }
 
+        /// <summary>
+        /// Add an item to the inventory slot
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="targetIndex"></param>
+        /// <param name="shouldEnable"></param>
         private void ItemAdder(KB_ItemContainer container, int targetIndex, bool shouldEnable)
         {
             if(targetIndex >= inventorySlots.Count)
@@ -432,7 +428,5 @@ namespace Knockback.Helpers
             catch (Exception exc) { Debug.Log(exc); }
         }
 
-
-        #endregion --Private Method--
     }
 }

@@ -259,6 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraData: {fileID: 11400000, guid: dec85616fd2ed4f49a5934d701823ad7, type: 2}
+  cameraRestingPosition: {x: 0, y: 0, z: 0}
   localTarget: {fileID: 0}
 --- !u!4 &190146229
 Transform:
@@ -332,7 +333,6 @@ MonoBehaviour:
   cachedButton: {fileID: 238650487}
   onSelectSprite: {fileID: 21300000, guid: 1dc88a75defe9b349bad7a893dbe5e3e, type: 3}
   onDeselectSprite: {fileID: 21300000, guid: f462e9117eb767743acad0eff35c5800, type: 3}
-  isSelected: 0
 --- !u!114 &238650485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -783,7 +783,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcdf366d230fb4d4c85bb1b129aef6dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gunSettings: {fileID: 11400000, guid: 3eb618047b89bd54e89c03a2aec0250c, type: 2}
+  gunSettingsResourceFetchString: 
+  bulletPrefabResourceFetchString: 
+  _gunSettings: {fileID: 0}
+  bulletPrefab: {fileID: 0}
+  projectileTransform: {fileID: 0}
+  poolSize: 0
+  poolName: BulletPool_
 --- !u!1 &1394565038
 GameObject:
   m_ObjectHideFlags: 0
@@ -841,7 +847,6 @@ MonoBehaviour:
   cachedButton: {fileID: 1394565043}
   onSelectSprite: {fileID: 21300000, guid: 1dc88a75defe9b349bad7a893dbe5e3e, type: 3}
   onDeselectSprite: {fileID: 21300000, guid: f462e9117eb767743acad0eff35c5800, type: 3}
-  isSelected: 0
 --- !u!114 &1394565041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1062,7 +1067,6 @@ MonoBehaviour:
   cachedButton: {fileID: 1993764338}
   onSelectSprite: {fileID: 21300000, guid: 1dc88a75defe9b349bad7a893dbe5e3e, type: 3}
   onDeselectSprite: {fileID: 21300000, guid: f462e9117eb767743acad0eff35c5800, type: 3}
-  isSelected: 0
 --- !u!114 &1993764336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1266,7 +1270,6 @@ MonoBehaviour:
   cachedButton: {fileID: 2034112193}
   onSelectSprite: {fileID: 21300000, guid: 1dc88a75defe9b349bad7a893dbe5e3e, type: 3}
   onDeselectSprite: {fileID: 21300000, guid: f462e9117eb767743acad0eff35c5800, type: 3}
-  isSelected: 0
 --- !u!114 &2034112191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1404,7 +1407,6 @@ MonoBehaviour:
   cachedButton: {fileID: 2129984088}
   onSelectSprite: {fileID: 21300000, guid: 1dc88a75defe9b349bad7a893dbe5e3e, type: 3}
   onDeselectSprite: {fileID: 21300000, guid: f462e9117eb767743acad0eff35c5800, type: 3}
-  isSelected: 0
 --- !u!114 &2129984086
 MonoBehaviour:
   m_ObjectHideFlags: 0

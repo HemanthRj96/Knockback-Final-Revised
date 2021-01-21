@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Knockback.Handlers;
 using EZCameraShake;
 using Knockback.Scriptables;
@@ -9,46 +7,81 @@ namespace Knockback.Controllers
 {
     public class KB_CameraController : MonoBehaviour
     {
-
-        #region --Attributes--
-
-
-        //*** Backend variables ***//
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
 
         [Header("Camera controller backend settings")]
         [Space]
+        [SerializeField] KB_CameraData cameraData = null;
+        [SerializeField] Vector3 cameraRestingPosition;
 
-        [SerializeField]
-        KB_CameraData cameraData;
+        //** --PUBLIC ATTRIBUTES--
 
-        //** Cached variables
+        public GameObject localTarget = null;
+
+        //** --PRIVATE ATTRIBUTES--
+
+        private bool isCameraFollowing => localTarget != null;
         private Vector3 aimOffset;
         private Vector3 targetPosition;
         private Vector3 smoothAimOffset;
         private bool canUse = false;
         private Camera mainCamera = null;
-        public GameObject localTarget = null;
+        private const string _REFERENCE_TAG = "MainCameraController";
 
+        //** --METHODS--
+        //** --PRIVATE METHODS--
 
-        #endregion --Attributes--
+        /// <summary>
+        /// Camera bootstrapping happens  here
+        /// </summary>
+        private void Awake() => CameraBootstrap();
 
-        #region --Private functions--
-
-
-        private void Awake()=> CameraBootstrap();
-
+        /// <summary>
+        /// Camera position and offset update happens here
+        /// </summary>
         private void FixedUpdate()
         {
-            if (localTarget == null)
-                TryGettingLocalTarget();
-
             if (canUse)
             {
-                float displacement = Vector2.Distance(transform.position, localTarget.transform.position);
-                float lerpControlVariable = displacement * cameraData.cameraDampingFactor.magnitude * Time.deltaTime;
+                if (isCameraFollowing)
+                {
+                    UpdateCameraPositionAndAimOffset();
+                    ClampCameraBounds();
+                }
+                else
+                {
+                    // Do something here
+                }
+            }
+        }
 
-                // Tracking the target gameobject
-                targetPosition = new Vector3
+        /// <summary>
+        /// Bootstrapper functions
+        /// </summary>
+        private void CameraBootstrap()
+        {
+            if (cameraData == null)
+                return;
+
+            KB_ReferenceHandler.Add(this, _REFERENCE_TAG);
+            transform.position += new Vector3(0, 0, cameraData.cameraRestingZOffset);
+            mainCamera = GetComponentInChildren<Camera>();
+            mainCamera.orthographicSize = cameraData.cameraFOV;
+            SetToDefaultPosition();
+            canUse = true;
+        }
+
+        /// <summary>
+        /// Returns the target objects position
+        /// </summary>
+        /// <returns></returns>
+        private Vector3 GetTargetPosition()
+        {
+            float displacement = Vector2.Distance(transform.position, localTarget.transform.position);
+            float lerpControlVariable = displacement * cameraData.cameraDampingFactor.magnitude * Time.deltaTime;
+
+            return new Vector3
                     (
                         Mathf.Lerp
                             (
@@ -64,79 +97,99 @@ namespace Knockback.Controllers
                             ),
                         transform.position.z
                     );
+        }
 
-                //Adding offset and offset damping
-                aimOffset.Normalize();
-                smoothAimOffset = new Vector3
-                    (
-                        Mathf.Lerp
-                            (
-                                smoothAimOffset.x,
-                                aimOffset.x,
-                                cameraData.offsetDampingFactor.x * Time.deltaTime
-                            ),
-                        Mathf.Lerp
-                            (
-                                smoothAimOffset.y,
-                                aimOffset.y,
-                                cameraData.offsetDampingFactor.y * Time.deltaTime
-                            ),
-                        transform.position.z
-                    );
-                transform.position = new Vector3
-                    (
-                        targetPosition.x + (smoothAimOffset.x * cameraData.offsetScaler.x / 10),
-                        targetPosition.y + (smoothAimOffset.y * cameraData.offsetScaler.y / 10),
-                        transform.position.z
-                    );
+        /// <summary>
+        /// Updates the camera position and offset
+        /// </summary>
+        private void UpdateCameraPositionAndAimOffset()
+        {
+            targetPosition = GetTargetPosition();
+            aimOffset.Normalize();
+            smoothAimOffset = new Vector3
+                (
+                    Mathf.Lerp
+                        (
+                            smoothAimOffset.x,
+                            aimOffset.x,
+                            cameraData.offsetDampingFactor.x * Time.deltaTime
+                        ),
+                    Mathf.Lerp
+                        (
+                            smoothAimOffset.y,
+                            aimOffset.y,
+                            cameraData.offsetDampingFactor.y * Time.deltaTime
+                        ),
+                    transform.position.z
+                );
 
-                //Clamping and assigning the transform
-                transform.position = new Vector3
+            transform.position = new Vector3
+                (
+                    targetPosition.x + (smoothAimOffset.x * cameraData.offsetScaler.x / 10),
+                    targetPosition.y + (smoothAimOffset.y * cameraData.offsetScaler.y / 10),
+                    transform.position.z
+                );
+        }
+
+        /// <summary>
+        /// Clamps the maximum limits of the camera
+        /// </summary>
+        private void ClampCameraBounds()
+        {
+            transform.position = new Vector3
                     (
                         Mathf.Clamp(transform.position.x, cameraData.minimumBounds.x, cameraData.maximumBounds.x),
                         Mathf.Clamp(transform.position.y, cameraData.minimumBounds.y, cameraData.maximumBounds.y),
                         transform.position.z
                     );
-            }
         }
 
-        private void CameraBootstrap()
+        /// <summary>
+        /// Sets the camera's position to the default position
+        /// </summary>
+        private void SetToDefaultPosition() => transform.position = cameraRestingPosition;
+
+        /// <summary>
+        /// Resets the camera to the defgault position
+        /// </summary>
+        private void ResetCamera()
         {
-            if (cameraData == null)
-                return;
-            transform.position += new Vector3(0, 0, cameraData.cameraRestingZOffset);
-            mainCamera = GetComponentInChildren<Camera>();
-            mainCamera.orthographicSize = cameraData.cameraFOV;
-            KB_ReferenceHandler.Add(this, "MainCameraController");
-            canUse = true;
+            SetToDefaultPosition();
+            localTarget = null;
         }
 
-        private void TryGettingLocalTarget() => KB_ReferenceHandler.GetReference("PlayerController", out localTarget);
 
+        //** --PUBLIC METHODS--
 
-#endregion --Private functions--
-
-        #region --Public functions--
-
-
+        /// <summary>
+        /// Returns the main camera
+        /// </summary>
         public Camera GetCamera() => mainCamera;
 
+        /// <summary>
+        /// Adds aim offset to the camera
+        /// </summary>
         public void AddAimOffset(Vector2 offset) => aimOffset = new Vector3(offset.x, offset.y, transform.position.z);
 
+        /// <summary>
+        /// Sets the local target the camera should follow
+        /// </summary>
         public void SetLocalTarget(GameObject localTarget) => this.localTarget = localTarget;
 
-        public void RemoveLocalTarget()
-        {
-            localTarget = null;
-            canUse = false;
-        }
+        /// <summary>
+        /// Shakes the camera with a magnitude
+        /// </summary>
+        /// <param name="magnitude">Magnitude of the shake</param>
+        public void ShakeCameraWithMagnitude(float magnitude) => CameraShaker.Instance.ShakeOnce(magnitude, cameraData.roughness, cameraData.fadeInTime, cameraData.fadeOutTime);
 
-        public void ShakeCameraWithMagnitude(float magnitude)
-        {
-            CameraShaker.Instance.ShakeOnce(magnitude, cameraData.roughness, cameraData.fadeInTime, cameraData.fadeOutTime);
-        }
+        /// <summary>
+        /// Removes the local target and resets the camera positions
+        /// </summary>
+        public void RemoveLocalTarget() => ResetCamera();
 
-
-        #endregion --Public functions--
+        /// <summary>
+        /// Allows to set the camera resting position externally
+        /// </summary>
+        public void SetTheCameraRestingPosition(Vector3 restingPosition) => cameraRestingPosition = restingPosition;
     }
 }

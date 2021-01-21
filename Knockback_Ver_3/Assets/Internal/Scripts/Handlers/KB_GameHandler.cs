@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using Knockback.Utility;
+using UnityEngine;
 
 namespace Knockback.Handlers
 {
     /// <summary>
     /// This is the class that runs before all the class begin
     /// </summary>
-    public class KB_GameHandler : MonoBehaviour
+    public class KB_GameHandler : KB_Singleton<KB_GameHandler>
     {
 
 

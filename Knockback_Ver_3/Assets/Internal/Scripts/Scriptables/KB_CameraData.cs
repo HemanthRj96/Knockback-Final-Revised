@@ -2,7 +2,7 @@
 
 namespace Knockback.Scriptables
 {
-    [CreateAssetMenu(fileName = "KB_CameraData", menuName = "Data/CameraData")]
+    [CreateAssetMenu(fileName = "Camera Data", menuName = "Data/Camera Data")]
     public class KB_CameraData : ScriptableObject
     {
         [Header("Camera controller backend settings")]

@@ -8,137 +8,217 @@ namespace Knockback.Controllers
 {
     public class KB_PlayerController : MonoBehaviour
     {
-        #region --Attributes--
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
 
-
-        //*** Backend variables ***//
         [Header("---Backend Settings---")]
         [SerializeField] private KB_InputSettings _inputSettings = new KB_InputSettings();
         [SerializeField] private KB_PlayerBackendSettings _playerSettings = new KB_PlayerBackendSettings();
         [SerializeField] private bool canUse = false;
-        [SerializeField] private bool useMouseAndKeyboard = true;
 
-        //*** Cached Variables ***//
+        //** --PUBLIC ATTRIBUTES--
+
         [Header("---Cached Components---")]
         public SpriteRenderer cachedSpriteRenderer = null;
         public Rigidbody2D cachedRigidbody = null;
         public Transform cachedWeaponSlot = null;
 
+        //** --PRIVATE ATTRIBUTES--
+
         private KB_InventoryHandler _inventoryHandler = new KB_InventoryHandler();
         private KB_Locomotion _locomotionHandler = new KB_Locomotion();
-        private KB_PlayerLookRotation _playerLookRotation = new KB_PlayerLookRotation();
-        private KB_PlayerWeaponHandler _weaponHandler = new KB_PlayerWeaponHandler();
+        private KB_PlayerSlotRotation _playerLookRotation = new KB_PlayerSlotRotation();
+        private KB_PlayerItemHandler _itemHandler = new KB_PlayerItemHandler();
+        private KB_PlayerKnockbackHandler _knockbackHandler = new KB_PlayerKnockbackHandler();
+        private bool canMove = true;
+        private bool isReady = true;
+        private bool isNetworked = false;
+        private const string _CAMERA_CONTROLLER_TAG = "MainCameraController";
 
+        //** --PUBLIC REFERENCES--
 
-        //*** External class objects ***//
         public KB_InventoryHandler inventoryHandler { get { return _inventoryHandler; } private set { _inventoryHandler = value; } }
         public KB_Locomotion locomotionHandler { get { return _locomotionHandler; } private set { _locomotionHandler = value; } }
         public KB_InputSettings inputSettings { get { return _inputSettings; } private set { _inputSettings = value; } }
         public KB_PlayerBackendSettings playerSettings { get { return _playerSettings; } private set { _playerSettings = value; } }
-        public KB_PlayerLookRotation playerLookRotation { get { return _playerLookRotation; } private set { _playerLookRotation = value; } }
-        public KB_PlayerWeaponHandler weaponHandler { get { return _weaponHandler; } private set { _weaponHandler = value; } }
+        public KB_PlayerSlotRotation playerSlotRotation { get { return _playerLookRotation; } private set { _playerLookRotation = value; } }
+        public KB_PlayerItemHandler itemHandler { get { return _itemHandler; } private set { _itemHandler = value; } }
+        public KB_PlayerKnockbackHandler knockbackHandler { get { return _knockbackHandler; } private set { _knockbackHandler = value; } }
 
 
-        private bool canMove = true;
-        private bool isReady = true;
-        private bool isNetworked = false;
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
+        /// <summary>
+        /// Externally modify the player backend settings like speed, jump height etc..
+        /// </summary>
+        /// <param name="settingType">Array of setting types that has to be changed</param>
+        /// <param name="values">Array of new values</param>
+        public void ModifySettings(PlayerBackendSettingType[] settingType, dynamic[] values) => playerSettings = new KB_PlayerBackendSettings(settingType, values);
 
-        #endregion --Attributes--
+        /// <summary>
+        /// Getter for settings
+        /// </summary>
+        public KB_PlayerBackendSettings GetSettings() => playerSettings;
 
-        #region --Private function--
+        //** --PRIVATE METHODS--
 
-
+        /// <summary>
+        /// Player controller boostrapper routine
+        /// </summary>
         private void Awake()
         {
-            InitializeObjects();
-
-            if (CheckComponentReferenceValidity())
-                canUse = true;
+            if (!CheckComponentReferenceValidity())
+                return;
+            canUse = true;
+            PlayerControllerBootstrap();
         }
 
+
+        /// <summary>
+        /// Set the camera target as this gameObject
+        /// </summary>
+        private void Start()
+        {
+            (KB_ReferenceHandler.GetReference(_CAMERA_CONTROLLER_TAG) as KB_CameraController)?.SetLocalTarget(gameObject);
+        }
+
+        /// <summary>
+        /// Update the input and rotation
+        /// </summary>
         private void Update()
         {
             if (!canUse || !isReady || !canMove)
                 return;
-            
-
-            InputUpdate();
-            UpdateRotation();
+            UpdateRoutine();
         }
 
+        /// <summary>
+        /// Update the movement of the player
+        /// </summary>
         private void FixedUpdate()
         {
             if (!canUse || !isReady || !canMove)
                 return;
-
-            MovementUpdate();
+            FixedUpdateRoutine();
         }
 
-        //private void OnDestroy() => StopAllCoroutines();
-
-        private void InitializeObjects()
+        /// <summary>
+        /// Returns true if the references are valid
+        /// </summary>
+        private bool CheckComponentReferenceValidity()
         {
-            KB_ReferenceHandler.Add(gameObject, "PlayerController");
+            if (cachedRigidbody != null & cachedSpriteRenderer != null)
+                return true;
+            else
+            {
+                new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {cachedSpriteRenderer}{cachedRigidbody}");
+                return false;
+            }
+        }
 
+        /// <summary>
+        /// Bootstrapper method
+        /// </summary>
+        private void PlayerControllerBootstrap()
+        {
             inventoryHandler = new KB_InventoryHandler(this);
             locomotionHandler = new KB_Locomotion(this);
             playerSettings = new KB_PlayerBackendSettings();
-            playerLookRotation = new KB_PlayerLookRotation(this);
-            weaponHandler = new KB_PlayerWeaponHandler(this);
-
+            playerSlotRotation = new KB_PlayerSlotRotation(this);
+            itemHandler = new KB_PlayerItemHandler(this);
+            knockbackHandler = new KB_PlayerKnockbackHandler(this, cachedRigidbody);
             StartCoroutine(InventorySlotLoader());
         }
 
-        private IEnumerator InventorySlotLoader() {
+        /// <summary>
+        /// Tries slot load after some buffer time
+        /// </summary>
+        private IEnumerator InventorySlotLoader()
+        {
             yield return new WaitForSeconds(1);
             inventoryHandler.TrySlotLoad();
         }
 
-        private bool CheckComponentReferenceValidity()
-        {
-            if (cachedRigidbody != null & cachedSpriteRenderer != null & inventoryHandler != null)
-                return true;
-            else
-            {
-                new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {cachedSpriteRenderer}{cachedRigidbody}{inventoryHandler}");
-                return false;
-            }
-        }        
-
-        private void UpdateRotation() => cachedWeaponSlot.rotation = playerLookRotation.GetCalculatedRotation();
-
-        public void ModifySettings(int[] index, dynamic[] values) => playerSettings = new KB_PlayerBackendSettings(index, values);
-
-        public KB_PlayerBackendSettings GetSettings() => playerSettings;
-
-        private void InputUpdate()
+        /// <summary>
+        /// This is the update routine that runs with the update call
+        /// </summary>
+        private void UpdateRoutine()
         {
             if (!isNetworked)
-                OfflineUpdate();
+            {
+                OfflineInputUpdate();
+                OfflineRotationUpdate();
+            }
             else
-                OnlineUpdate();
+            {
+                // Do things if networked
+            }
         }
 
-        private void MovementUpdate()
+        /// <summary>
+        /// This is the fixed update routine that runs with the fixed update
+        /// </summary>
+        private void FixedUpdateRoutine()
+        {
+            if (!isNetworked)
+            {
+                OfflineMovementUpdate();
+            }
+            else
+            {
+                // Do something if networked
+            }
+        }
+
+        /// <summary>
+        /// Offline input update
+        /// </summary>
+        private void OfflineInputUpdate()
+        {
+            locomotionHandler.Jump(inputSettings.JumpInput());
+            itemHandler.UseWeapon(inputSettings.FireInput());
+        }
+
+        /// <summary>
+        /// Online input update
+        /// </summary>
+        private void OnlineInputUpdate()
+        {
+
+        }
+
+        /// <summary>
+        /// Offline rotation update
+        /// </summary>
+        private void OfflineRotationUpdate()
+        {
+            cachedWeaponSlot.rotation = playerSlotRotation.GetCalculatedRotation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void OnlineRotationUpdate()
+        {
+
+        }
+
+        /// <summary>
+        /// Offline movement update
+        /// </summary>
+        private void OfflineMovementUpdate()
         {
             locomotionHandler.Move(inputSettings.MovementInput().x);
-            locomotionHandler.Jump(inputSettings.JumpInput());
             locomotionHandler.Dash(inputSettings.DashInput());
         }
 
-        private void OfflineUpdate()
+        /// <summary>
+        /// Online movement update
+        /// </summary>
+        private void OnlineMovementUpdate()
         {
-            locomotionHandler.Jump(inputSettings.JumpInput());
-        }
 
-        private void OnlineUpdate()
-        {
-            // For networked systems
-
-        }
-
-
-        #endregion --Private functions--
+        }        
     }
 }

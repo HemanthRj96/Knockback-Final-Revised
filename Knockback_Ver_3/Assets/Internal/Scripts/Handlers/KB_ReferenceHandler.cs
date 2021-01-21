@@ -77,6 +77,19 @@ namespace Knockback.Handlers
         }
 
         /// <summary>
+        /// Return the the object from the container if found and null otherwise
+        /// </summary>
+        /// <param name="tag">String tag for the camera controller</param>
+        /// <returns></returns>
+        public static Object GetReference(string tag)
+        {
+            foreach (var temp in container)
+                if (temp.IsEqual(tag))
+                    return temp.GetValue();
+            return null;
+        }
+
+        /// <summary>
         /// Returns true if the specified data type is found and false otherwise
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -94,29 +107,6 @@ namespace Knockback.Handlers
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Returns true if the specified data type is found and false otherwise
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value">Out array variable of the required type</param>
-        /// <returns></returns>
-        public static bool GetReferences<T>(out List<T> value) where T : class
-        {
-            bool flag = false;
-            List<T> tempArray = new List<T>();
-
-            foreach (var temp in container)
-            {
-                if (temp.GetValue() is T)
-                {
-                    tempArray.Add(temp.GetValue() as T);
-                    flag = true;
-                }
-            }
-            value = tempArray;
-            return flag;
         }
 
         /// <summary>
@@ -142,6 +132,31 @@ namespace Knockback.Handlers
             }
             return flag;
         }
+
+        /// <summary>
+        /// Returns true if the specified data type is found and false otherwise
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value">Out array variable of the required type</param>
+        /// <returns></returns>
+        public static bool GetReferences<T>(out List<T> value) where T : class
+        {
+            bool flag = false;
+            List<T> tempArray = new List<T>();
+
+            foreach (var temp in container)
+            {
+                if (temp.GetValue() is T)
+                {
+                    tempArray.Add(temp.GetValue() as T);
+                    flag = true;
+                }
+            }
+            value = tempArray;
+            return flag;
+        }
+
+
 
         private static bool DuplicateCheck(string tag)
         {

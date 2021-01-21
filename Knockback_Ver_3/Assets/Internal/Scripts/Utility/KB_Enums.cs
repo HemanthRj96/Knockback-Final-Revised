@@ -1,10 +1,10 @@
 ﻿namespace Knockback.Utility
 {
 
-    public enum ItemSlotType 
-    { 
-        Pickup, 
-        Inventory 
+    public enum ItemSlotType
+    {
+        Pickup,
+        Inventory
     }
 
     public enum SplashDamageType
@@ -66,10 +66,32 @@
     }
 
     public enum InputType
-    { 
+    {
         defaultNull,
         MouseAndKeyboard,
         Touch
     }
 
+    public enum PlayerBackendSettingType
+    {
+        defaultNull,
+        moveSpeed,
+        jumpForce,
+        airControl,
+        groundCheckerLayerMask,
+        dashingCooldown,
+        dashingSpeed,
+        dashingDistance
+    }
+
+    public enum Layers
+    {
+        defaulNull = 0,
+        player = 8,
+        ignorePlayer = 9,
+        ground = 10,
+        trigger = 11,
+        transparent  = 12,
+        destructables = 13,
+    }
 }

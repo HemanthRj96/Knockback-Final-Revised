@@ -17,8 +17,8 @@ TagManager:
   - IgnorePlayer
   - Ground
   - Trigger
-  - 
-  - 
+  - Transparent
+  - Destructables
   - 
   - 
   - 

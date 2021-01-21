@@ -1,58 +1,62 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.Collections;
+using Knockback.Controllers;
 using Knockback.Helpers;
 
 namespace Knockback.Core
 {
+    /// <summary>
+    /// It should be inherited based on the type of injector or the type of ability it injects into player controller
+    /// </summary>
     public class KB_AbilityInjectorCore : MonoBehaviour
     {
-        //todo: Commenting
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
 
-        [SerializeField]
-        private KB_Ability ability;
+        [Header("Ability backend settings")]
+        [SerializeField] private KB_MasterAbility targetAbility = new KB_MasterAbility();
+        [SerializeField] private bool hasTriggerVolume = true;
 
-        private string _id = "";
-        public string injectorId { get { return _id; } private set { _id = value; } }
+        //** --PRIVATE ATTRIBUTES--
+
+        private bool isPickedUp = false;
+        private KB_PlayerController controller = null;
 
 
-        public string GetUniqueId()
+        //** --METHODS--
+        //** --PUBLIC METHODS--
+
+        /// <summary>
+        /// This method is used to invoke the ability externally
+        /// </summary>
+        /// <param name="controller"></param>
+        public void InvokeExternally(KB_PlayerController controller)
         {
-            if (injectorId != "")
-                return injectorId;
-            else
+            targetAbility.StartAbilityRoutine(controller, AbilityEndCallback);
+        }
+
+        //** --PROTECTED METHODS--
+
+        /// <summary>
+        /// Override this method to run a routine after the ability ends
+        /// </summary>
+        protected virtual void AbilityEndCallback() { }
+
+        /// <summary>
+        /// Override this method to run a routine after the ability begins
+        /// </summary>
+        protected virtual void AbilityBeginCallback() { }
+
+        //** --PRIVATE METHODS--
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (isPickedUp || !hasTriggerVolume)
+                return;
+            if (collision.TryGetComponent(out controller))
             {
-                const string _glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                const int _codeSegments = 3;
-                const int _segmentLength = 3;
-                string _string = "";
-
-                for (int i = 0; i < _codeSegments - 1; i++)
-                {
-                    for (int j = 0; j < _segmentLength; j++)
-                    {
-                        _string += _glyphs[Random.Range(0, _glyphs.Length)];
-                    }
-                    _string += "-";
-                }
-                for (int j = 0; j < _segmentLength; j++)
-                {
-                    _string += _glyphs[Random.Range(0, _glyphs.Length)];
-                }
-                SetUniqueId(_string);
-
-                return _string;
+                isPickedUp = true;
+                targetAbility.StartAbilityRoutine(controller, AbilityBeginCallback, AbilityEndCallback);
             }
         }
-
-        protected void SetUniqueId(string id)
-        {
-            if (injectorId != "")
-                return;
-            injectorId = id;
-        }
-
-        public KB_Ability GetAbility() => ability;
     }
 }

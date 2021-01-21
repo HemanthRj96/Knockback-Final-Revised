@@ -4,13 +4,14 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-// todo: Commenting :: ItemSlot
-// todo: Implement surface implementation of the hud text like :- setting text, resetting text and enabling/disable text
 
 namespace Knockback.Helpers
 {
     public class KB_ItemSlot : MonoBehaviour
     {
+        #region --Attributes--
+
+
         [Header("Item slot deafult settings")]
         [Space]
 
@@ -26,15 +27,15 @@ namespace Knockback.Helpers
         private Action<int> buttonClickAction = delegate { };
 
         public bool isFull => itemContainer != null;
+        public bool isSelected { get; private set; } = false;
 
 
-        [HideInInspector]
-        public bool isSelected = false;
+        #endregion --Attributes--
 
-        private bool buttonClick = false;
+        #region --Private functions--
+
 
         private void Awake() => BootStrap();
-
 
         private void BootStrap()
         {
@@ -51,6 +52,12 @@ namespace Knockback.Helpers
             cachedImage.sprite = targetSprite;
         }
 
+
+        #endregion --Private functions--
+
+        #region --Public functions--
+
+
         public void SelectSlot()
         {
             // Debug.Log("Select slot " + slotId);
@@ -65,7 +72,6 @@ namespace Knockback.Helpers
             isSelected = false;
         }
 
-
         public void SetState(bool isActive = false) => gameObject.SetActive(isActive);
 
         public void SetAction(Action<int> action) => buttonClickAction = action;
@@ -77,9 +83,9 @@ namespace Knockback.Helpers
         public KB_ItemContainer GetContainer() => itemContainer;
         public Button GetButton() => cachedButton;
 
-
-        // todo: Remove the flag check if whenreleasing into mobile edition
         public void OnButtonClick() => buttonClickAction.Invoke(slotId);
 
+
+        #endregion --Public functions--
     }
 }

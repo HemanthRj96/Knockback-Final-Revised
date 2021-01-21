@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Knockback.Utility;
 
 namespace Knockback.Helpers
 {
@@ -16,34 +17,34 @@ namespace Knockback.Helpers
 
         public KB_PlayerBackendSettings() { }
 
-        public KB_PlayerBackendSettings(int[] variableModifierIndex, dynamic[] values)
+        public KB_PlayerBackendSettings(PlayerBackendSettingType[] variableType, dynamic[] values)
         {
-            if (variableModifierIndex.Length != values.Length)
+            if (variableType.Length != values.Length)
                 return;
 
-            for (int index = 0; index < variableModifierIndex.Length; index++)
+            for (int index = 0; index < variableType.Length; index++)
             {
-                switch (variableModifierIndex[index])
+                switch (variableType[index])
                 {
-                    case 0:
+                    case PlayerBackendSettingType.moveSpeed:
                         moveSpeed = values[index];
                         break;
-                    case 1:
+                    case PlayerBackendSettingType.jumpForce:
                         jumpForce = values[index];
                         break;
-                    case 2:
+                    case PlayerBackendSettingType.airControl:
                         airControl = values[index];
                         break;
-                    case 3:
+                    case PlayerBackendSettingType.groundCheckerLayerMask:
                         groundCheckerLayerMask = values[index];
                         break;
-                    case 4:
+                    case PlayerBackendSettingType.dashingCooldown:
                         dashingCooldown = values[index];
                         break;
-                    case 5:
+                    case PlayerBackendSettingType.dashingSpeed:
                         dashingSpeed = values[index];
                         break;
-                    case 6:
+                    case PlayerBackendSettingType.dashingDistance:
                         dashingDistance = values[index];
                         break;
                     default:

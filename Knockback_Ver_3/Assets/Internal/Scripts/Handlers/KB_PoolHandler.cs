@@ -30,7 +30,7 @@ namespace Knockback.Handlers
         private List<PoolData> poolList = new List<PoolData>();
         private Dictionary<string, Queue<GameObject>> poolCollection = new Dictionary<string, Queue<GameObject>>();
 
-        protected override void Awake() { base.Awake(); }
+        protected override void Awake() => base.Awake();
 
         /// <summary>
         /// Create a pool automatically from the pool list
@@ -87,6 +87,11 @@ namespace Knockback.Handlers
             targetObject.SetActive(true);
             poolCollection[tag].Enqueue(targetObject);
             return targetObject;
+        }
+
+        public bool DoesPoolExist(string tag)
+        {
+            return poolCollection.ContainsKey(tag);
         }
 
         /// <summary>

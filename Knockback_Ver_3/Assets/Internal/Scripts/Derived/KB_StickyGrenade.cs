@@ -58,7 +58,7 @@ namespace Knockback.Derived
             if (source == null)
                 return;
             KB_InventoryHandler inventoryHandler = null;
-            KB_PickupManager pickupManager = GetComponent<KB_PickupManager>();
+            KB_ItemInteractor pickupManager = GetComponent<KB_ItemInteractor>();
             if (source.GetComponent<KB_PlayerController>())
             {
                 inventoryHandler = source.GetComponent<KB_PlayerController>().inventoryHandler;

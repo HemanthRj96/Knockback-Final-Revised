@@ -86,7 +86,7 @@ MonoBehaviour:
     interactInput: 0
     cancelInput: Cancel
     readyInput: Ready
-    inputType: 2
+    inputType: 1
     joystickDeadzone: 0.8
   _playerSettings:
     groundCheckerLayerMask:
