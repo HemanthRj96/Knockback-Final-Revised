@@ -12,6 +12,8 @@ namespace Knockback.Core
         /// </summary>
         protected Dictionary<GameObject, float> overlappedObjects = new Dictionary<GameObject, float>();
 
+        protected GameObject source;
+
         /// <summary>
         /// Invoke this method to apply splash damage at any point
         /// </summary>
@@ -43,7 +45,7 @@ namespace Knockback.Core
 
                 Debug.LogError($"Collided object={overlappedGameObject}|Distance from collider={distanceFromCollider}|Closest point={closestPoint}|Damage percent={damagePercent}|Final damage={finalDamage}");
 
-                damageHandle.ApplyDamage(finalDamage);
+                damageHandle.ApplyDamage(finalDamage, source);
                 overlappedObjects.Add(overlappedGameObject, finalDamage);
             }
 
@@ -65,7 +67,7 @@ namespace Knockback.Core
                 {
                     try
                     {
-                        overlappedObject.Key.GetComponent<IDamage>().ApplyDamage(overlappedObject.Value * damageReducePercent);
+                        overlappedObject.Key.GetComponent<IDamage>().ApplyDamage(overlappedObject.Value * damageReducePercent, source);
                     }
                     catch (System.Exception exc)
                     {

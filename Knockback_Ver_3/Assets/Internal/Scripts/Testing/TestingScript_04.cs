@@ -8,13 +8,15 @@ namespace Knockback.Testing
     {
         public float DamageTaken = 0;
 
-        public void ApplyDamage(float damage)
+        public void ApplyDamage(float damage, GameObject source)
         {
             DamageTaken += damage;
         }
 
-        public void RemoveDamage(float damage)
+
+        public void RemoveDamage(float damage, GameObject source)
         {
+            throw new System.NotImplementedException();
         }
     }
 }

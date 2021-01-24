@@ -45,5 +45,17 @@ namespace Knockback.Utility
                 layerMask = ~layerMask;
             return layerMask;
         }
+
+        public static Vector2 GetDirectionOfVector(this Vector2 inputVector, Vector2 relativeTo)
+        {
+            Vector2 difference = relativeTo - inputVector;
+            difference.Normalize();
+            return difference;
+        }
+
+        public static float GetAngleOfRotationFromDirection(this Vector2 directionVector)
+        {
+            return Mathf.Atan2(directionVector.y, directionVector.x) * Mathf.Rad2Deg;
+        }
     }
 }

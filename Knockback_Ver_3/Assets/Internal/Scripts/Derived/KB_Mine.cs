@@ -3,10 +3,11 @@ using System.Collections;
 using Knockback.Core;
 using Knockback.Helpers;
 using Knockback.Controllers;
+using Knockback.Utility;
 
 namespace Knockback.Derived
 {
-    public class KB_Mine : KB_ThrowableCore
+    public class KB_Mine : KB_ThrowableCore, IUsableEntity
     {
         //todo: Commenting :: Mine
         //todo: Network implementation
@@ -26,6 +27,7 @@ namespace Knockback.Derived
         {
             if (!canUse)
                 return;
+            base.source = source;
             RemoveFromInventory(source);
             Throw(transform.rotation * Vector2.right, throwVelocity);
         }

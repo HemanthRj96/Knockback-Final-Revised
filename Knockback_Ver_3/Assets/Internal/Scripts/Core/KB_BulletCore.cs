@@ -22,6 +22,9 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     public bool canUse { get; set; } = true;
     public KB_BulletModifier bulletModifier = null;
 
+    //** --PUBLIC REFERENCES--
+
+    public GameObject source { private set; get; }
 
     //** --METHODS--
     //** --PUBLIC METHODS--
@@ -38,12 +41,29 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     /// <param name="impactDamage">Impact damage of the bullet</param>
     /// <param name="direction">Direction of the bullet</param>
     /// <param name="velocity">Velocity of the bullet</param>
-    public void SetBulletParameters(float impactDamage, Vector2 direction, float velocity, bool shouldIgnoreSelf = true, Action<GameObject> functionCallback = null)
+    public void SetBulletParameters
+        (
+            float impactDamage, 
+            Vector2 direction, 
+            float velocity, 
+            bool shouldIgnoreSelf = true, 
+            Action<GameObject> functionCallback = null, 
+            bool shouldPassthrough = false, 
+            bool shouldRicochet = false
+        )
     {
         this.direction = direction;
         this.shouldIgnoreSelf = shouldIgnoreSelf;
         this.functionCallback = functionCallback;
         bulletModifier.SetDamageAndSpeed(impactDamage, velocity);
+        if (shouldPassthrough)
+            bulletModifier.EnablePassthrough();
+        else
+            bulletModifier.DisablePassthrough();
+        if (shouldRicochet)
+            bulletModifier.EnableRicochet();
+        else
+            bulletModifier.DisableRicochet();
     }
 
     /// <summary>
@@ -78,13 +98,14 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     /// </summary>
     private IEnumerator Fire(GameObject source)
     {
+        this.source = source;
         // Propel the bullet
         bulletModifier.StartBulletTranslation();
 
         while (bulletModifier.m_canDetect)
         {
             pointA = transform.position;
-            yield return new WaitForSecondsRealtime(0.001f);
+            yield return null;
             pointB = transform.position;
 
             RaycastHit2D hit = bulletModifier.DoRayCast(pointA, transform.rotation * Vector2.right, Vector2.Distance(pointA, pointB));

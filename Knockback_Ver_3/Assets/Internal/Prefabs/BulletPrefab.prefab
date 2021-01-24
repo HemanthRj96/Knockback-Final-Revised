@@ -60,11 +60,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc454c87e6b8e47498df48b84caa791e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_minimumAngleFromNormal: 0
+  m_minimumAngleFromNormal: 75
   m_maximumRicochetLimit: 10
+  m_bulletLifeTime: 20
   m_detectionLayer:
     serializedVersion: 2
     m_Bits: 1280
+  m_ricochetCounter: 0
+  m_totalRicochetCounter: 0
   m_canDetect: 1
 --- !u!212 &5738927929395870904
 SpriteRenderer:

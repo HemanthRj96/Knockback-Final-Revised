@@ -36,8 +36,8 @@ namespace Knockback.Utility
     /// </summary>
     public interface IDamage
     {
-        void ApplyDamage(float damage);
-        void RemoveDamage(float damage);
+        void ApplyDamage(float damage, GameObject source);
+        void RemoveDamage(float damage, GameObject source);
     }
 
     /// <summary>
@@ -49,4 +49,10 @@ namespace Knockback.Utility
         GameObject source { get; set; }
         float timeUntilActivation { get; set; }
     }
+
+    public interface IUIAction
+    {
+        void DoAction(IMessage _message = null);
+    }
+
 }

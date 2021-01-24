@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Knockback.Controllers;
 using Knockback.Handlers;
+using Knockback.Utility;
 
 namespace Knockback.Helpers
 {
@@ -20,6 +21,10 @@ namespace Knockback.Helpers
         public Quaternion GetCalculatedRotation()
         {
             Vector2 difference = Vector2.zero;
+            // Do this if you're running the game in debug mode
+            Vector2 playerPos = controlledActor.transform.position;
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
             Quaternion targetRotation = Quaternion.identity;
 
             if (cameraController == null)
@@ -27,17 +32,12 @@ namespace Knockback.Helpers
                     useAlternateInput = true;
 
             if (inputSettings.GetInputType() == Utility.InputType.MouseAndKeyboard && !useAlternateInput)
-            {
-                difference = cameraController.GetCamera().ScreenToWorldPoint(Input.mousePosition) - controlledActor.transform.position;
-                difference.Normalize();
-            }
+                difference = playerPos.GetDirectionOfVector(mousePos);
             else
-            {
                 difference = new Vector2(inputSettings.MovementInput().x, inputSettings.MovementInput().y);
-            }
 
             if (difference != Vector2.zero)
-                rotationInDegrees = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+                rotationInDegrees = difference.GetAngleOfRotationFromDirection();
 
             targetRotation = Quaternion.Euler(0, 0, rotationInDegrees);
 

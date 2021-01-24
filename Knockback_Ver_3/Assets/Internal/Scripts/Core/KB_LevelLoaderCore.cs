@@ -4,23 +4,18 @@ using System;
 using Knockback.Utility;
 using System.Collections.Generic;
 
-
-namespace Knockback.Handlers
+namespace Knockback.Core
 {
-    public class KB_LevelHandler : MonoBehaviour
+    public class KB_LevelLoaderCore : MonoBehaviour
     {
         //todo: Network implementation part
 
         [Header("Level Manager Settings")]
         [Space]
-        [SerializeField]
-        protected LevelNames targetLevel;
-        [SerializeField]
-        protected LoadSceneMode targetLoadSceneMode = LoadSceneMode.Single;
-        [SerializeField]
-        protected List<KB_LevelHandler> forwardNavigation = new List<KB_LevelHandler>();
-        [SerializeField]
-        protected List<KB_LevelHandler> backwardNavigation = new List<KB_LevelHandler>();
+        [SerializeField] protected LevelNames targetLevel;
+        [SerializeField] protected LoadSceneMode targetLoadSceneMode = LoadSceneMode.Single;
+        [SerializeField] protected List<KB_LevelLoaderCore> forwardNavigation = new List<KB_LevelLoaderCore>();
+        [SerializeField] protected List<KB_LevelLoaderCore> backwardNavigation = new List<KB_LevelLoaderCore>();
 
         [HideInInspector]
         public bool isLevelLoaded { get; protected set; }
@@ -82,7 +77,7 @@ namespace Knockback.Handlers
         /// </summary>
         /// <returns></returns>
         public virtual AsyncOperation BeginUnloadingLevel()
-        {           
+        {
             return UnloadLevel();
         }
 

@@ -34,7 +34,7 @@ namespace Knockback.Handlers
         private readonly float _type3_Modifier = 0.7f;
 
 
-        public void ApplyDamage(float damage)
+        public void ApplyDamage(float damage, GameObject source)
         {
             if (state.armourType == ArmourTypes.DefaultNull)
                 state = new DynamicStates(-damage);
@@ -67,7 +67,7 @@ namespace Knockback.Handlers
             }
         }
 
-        public void RemoveDamage(float damage)
+        public void RemoveDamage(float damage, GameObject source)
         {
             state = new DynamicStates(damage);
         }

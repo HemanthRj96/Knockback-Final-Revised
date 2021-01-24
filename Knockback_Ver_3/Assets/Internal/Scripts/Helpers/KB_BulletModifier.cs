@@ -21,9 +21,10 @@ namespace Knockback.Helpers
         private float m_speed;
         private bool m_updateThroughPathpoints = false;
         private bool m_shouldPassthrough = false;
-        private int m_ricochetCounter = 0;
-        private int m_totalRicochetCounter = 0;
+        public int m_ricochetCounter = 0;
+        public int m_totalRicochetCounter = 0;
         private Rigidbody2D m_rb = null;
+        private KB_BulletCore bulletCore = null;
         private RaycastHit2D m_upcomingHit;
         private List<Vector2> m_ricochetHitPoints = new List<Vector2>();
         private List<Quaternion> m_ricochetPointRotations = new List<Quaternion>();
@@ -55,11 +56,14 @@ namespace Knockback.Helpers
         public void StartBulletTranslation()
         {
             Invoke("DeactivateBullet", m_bulletLifeTime);
-            CreateNewPath();
-            if (m_totalRicochetCounter == 0)
-                MoveWithRigidbody(m_bulletDirection);
-            else
+
+            if (m_shouldRicochet)
+            {
+                CreatePredictionPath();
                 m_updateThroughPathpoints = true;
+            }
+            else
+                MoveWithRigidbody(m_bulletDirection);
         }
 
         /// <summary>
@@ -68,12 +72,25 @@ namespace Knockback.Helpers
         /// <param name="hit">Target hit parameter</param>
         public bool OnHit(RaycastHit2D hit)
         {
-            IDamage damageHandler = null;
+            bool hasDamage = TryApplyingDamage(hit);
 
-            if (hit.collider.gameObject.TryGetComponent(out damageHandler))
-                ApplyDamage(damageHandler);
-
-            TryBulletDynamics(hit, damageHandler);
+            if (hasDamage)
+            {
+                if (!m_shouldPassthrough)
+                    StopBullet(true);
+            }
+            else if (m_shouldPassthrough)
+            {
+                return true;
+            }
+            else if(!CanRicochet())
+            {
+                StopBullet(true);
+            }
+            else if (m_shouldRicochet)
+            {
+                TryBulletRicochet(hit);
+            }
             return true;
         }
 
@@ -117,13 +134,16 @@ namespace Knockback.Helpers
         /// </summary>
         public bool ShouldRicochet() => m_shouldRicochet;
 
-
         //** --PRIVATE METHODS--
 
         /// <summary>
         /// Assign the rigidbody 
         /// </summary>
-        private void Awake() => m_rb = GetComponent<Rigidbody2D>();
+        private void Awake()
+        {
+            m_rb = GetComponent<Rigidbody2D>();
+            bulletCore = GetComponent<KB_BulletCore>();
+        }
 
         /// <summary>
         /// FixedUpdate where the bullet will move according to the pathpoints if updateThroughPathPoints is set as true
@@ -135,39 +155,6 @@ namespace Knockback.Helpers
         }
 
         /// <summary>
-        /// Method to apply passthrough and ricochet ability to the bullet
-        /// </summary>
-        /// <param name="hit">Hit parameter</param>
-        /// <param name="damageHandler">Damage handler</param>
-        private void TryBulletDynamics(RaycastHit2D hit, IDamage damageHandler)
-        {
-            if (m_shouldPassthrough)
-                return;
-            else if (damageHandler != null || !m_shouldRicochet)
-            {
-                m_canDetect = false;
-                StopBullet();
-                return;
-            }
-            else if (m_ricochetCounter == m_maximumRicochetLimit)
-            {
-                m_updateThroughPathpoints = false;
-                StopBullet(true);
-                return;
-            }
-            else
-            {
-                if (CheckIfTheHitExists(hit))
-                    return;
-                m_totalRicochetCounter = m_ricochetCounter;
-                m_ricochetCounter = 0;
-                ClearRicochetList();
-                CreateNewPath();
-                return;
-            }
-        }
-
-        /// <summary>
         /// Method to move the bullet
         /// </summary>
         private void TranslateThroughPathPoints()
@@ -176,7 +163,7 @@ namespace Knockback.Helpers
             {
                 if (CheckForClosingDistance(m_ricochetHitPoints[m_ricochetCounter]))
                 {
-                    UpdateBulletRotation();
+                    ApplyNewRotation();
                     ++m_ricochetCounter;
                 }
                 else
@@ -190,25 +177,26 @@ namespace Knockback.Helpers
         }
 
         /// <summary>
-        /// Just make the bullet go indefinitely
+        /// Method to apply passthrough and ricochet ability to the bullet
         /// </summary>
-        private void MoveWithRigidbody(Vector2 direction)
+        /// <param name="hit">Hit parameter</param>
+        /// <param name="damageHandler">Damage handler</param>
+        private void TryBulletRicochet(RaycastHit2D hit)
         {
-            if (m_rb.velocity.magnitude < m_speed)
-                m_rb.velocity = m_speed * direction;
+            if (CheckIfTheHitExists(hit))
+                return;
+            UpdatePredictionPath(hit);
         }
 
         /// <summary>
         /// Create a new path for the bullet to go
         /// </summary>
-        private void CreateNewPath()
+        private void CreatePredictionPath()
         {
-            if (!m_shouldRicochet)
-                return;
-
             Vector2 startPosition = transform.position;
             Vector2 direction = transform.rotation * Vector2.right;
             RaycastHit2D hit;
+            int index = 0;
 
             while (true)
             {
@@ -221,8 +209,10 @@ namespace Knockback.Helpers
                     {
                         if (m_totalRicochetCounter == m_maximumRicochetLimit)
                             break;
-                        if (m_ricochetCounter == 0)
+                        if (index == 0)
                             m_upcomingHit = hit;
+
+                        ++index;
                         ++m_totalRicochetCounter;
 
                         direction = Vector2.Reflect(direction, hit.normal);
@@ -242,31 +232,87 @@ namespace Knockback.Helpers
         }
 
         /// <summary>
-        /// Method to clear the ricochet lists
+        /// Method to update the current path to new one
         /// </summary>
-        private void ClearRicochetList()
+        /// <param name="hit"></param>
+        private void UpdatePredictionPath(RaycastHit2D hit)
         {
-            m_ricochetHitPoints.Clear();
-            m_ricochetPointRotations.Clear();
-            m_hitResults.Clear();
+            m_updateThroughPathpoints = false;
+            transform.position = hit.point - (m_bulletDirection * 0.25f);
+            TruncateRicochetList(m_ricochetCounter - 1);
+            m_totalRicochetCounter = m_ricochetCounter;
+            CreatePredictionPath();
         }
 
         /// <summary>
-        /// Method to apply damage to the damage handler
+        /// Returns true if the ricochetCounter has reached the maximum
         /// </summary>
-        /// <param name="damageHandler"></param>
-        private void ApplyDamage(IDamage damageHandler) => damageHandler?.ApplyDamage(m_impactDamage);
+        private bool CanRicochet() => m_ricochetCounter < m_maximumRicochetLimit;
 
         /// <summary>
-        /// Returns true if the target reaches the end point
+        /// Truncate the elements after the index
         /// </summary>
-        private bool CheckForClosingDistance(Vector2 endPoint) => Vector2.Distance(transform.position, endPoint) < 0.001f;
+        /// <param name="index"></param>
+        private void TruncateRicochetList(int index)
+        {
+            if (index < 0)
+            {
+                m_ricochetHitPoints.Clear();
+                m_ricochetPointRotations.Clear();
+                m_hitResults.Clear();
+            }
+            else
+            {
+                m_ricochetHitPoints.RemoveRange(index, (m_ricochetHitPoints.Count - 1) - index);
+                m_ricochetPointRotations.RemoveRange(index, (m_ricochetPointRotations.Count - 1) - index);
+                m_hitResults.RemoveRange(index, (m_hitResults.Count - 1) - index);
+            }
+        }
+
+        /// <summary>
+        /// Applies new rotation to the bullet
+        /// </summary>
+        private void ApplyNewRotation()
+        {
+            if ((m_ricochetCounter + 1) < m_hitResults.Count)
+                m_upcomingHit = m_hitResults[m_ricochetCounter + 1];
+            transform.rotation = m_ricochetPointRotations[m_ricochetCounter];
+        }
+
+        /// <summary>
+        /// Method to move bullet using rigidBody
+        /// </summary>
+        private void MoveWithRigidbody(Vector2 direction)
+        {
+            if (m_rb.velocity.magnitude < m_speed)
+                m_rb.velocity = m_speed * direction;
+        }
 
         /// <summary>
         /// Move the bullet to the target endPoint
         /// </summary>
         /// <param name="endPoint">Target endpoint</param>
         private void MoveTowards(Vector2 endPoint) => transform.position = Vector2.MoveTowards(transform.position, endPoint, m_speed * Time.deltaTime);
+
+        /// <summary>
+        /// Method to apply damage to the damage handler
+        /// </summary>
+        /// <param name="damageHandler"></param>
+        private bool TryApplyingDamage(RaycastHit2D hit)
+        {
+            IDamage damageHandler;
+            if (hit.collider.TryGetComponent(out damageHandler))
+            {
+                damageHandler?.ApplyDamage(m_impactDamage, bulletCore.source);
+                return true;
+            }
+            else return false;
+        }
+
+        /// <summary>
+        /// Returns true if the target reaches the end point
+        /// </summary>
+        private bool CheckForClosingDistance(Vector2 endPoint) => Vector2.Distance(transform.position, endPoint) < 0.001f;
 
         /// <summary>
         /// Returns true if the bullet has the minimum ricochet angle
@@ -283,16 +329,6 @@ namespace Knockback.Helpers
         private Quaternion GetNewRicochetRotation(Vector2 direction) => Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg));
 
         /// <summary>
-        /// Update to the next point if it exists
-        /// </summary>
-        private void UpdateBulletRotation()
-        {
-            if ((m_ricochetCounter + 1) < m_hitResults.Count)
-                m_upcomingHit = m_hitResults[m_ricochetCounter + 1];
-            transform.rotation = m_ricochetPointRotations[m_ricochetCounter];
-        }
-
-        /// <summary>
         /// Method to stop the bullet at any point
         /// </summary>
         /// <param name="shouldDeactivate">Assign true if you want to deactivate the bullet</param>
@@ -301,7 +337,10 @@ namespace Knockback.Helpers
             if (shouldDeactivate)
                 DeactivateBullet();
             else
+            {
+                m_updateThroughPathpoints = false;
                 m_rb.velocity = Vector3.zero;
+            }
         }
 
         /// <summary>
@@ -309,8 +348,9 @@ namespace Knockback.Helpers
         /// </summary>
         private void DeactivateBullet()
         {
-            m_rb.velocity = Vector3.zero;
+            m_updateThroughPathpoints = false;
             m_canDetect = false;
+            m_rb.velocity = Vector3.zero;
             gameObject.SetActive(false);
         }
     }

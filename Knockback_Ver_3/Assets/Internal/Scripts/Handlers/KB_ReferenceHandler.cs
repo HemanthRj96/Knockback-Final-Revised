@@ -1,30 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using Knockback.Utility;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Knockback.Handlers
 {
     public static class KB_ReferenceHandler
     {
-        public class ObjectContainer
-        {
-            public ObjectContainer(Object value, string tag) { this.value = value; this.tag = tag; }
 
-            private Object value;
-            private string tag;
-
-            public Object GetValue() { return value; }
-            public string GetTag() { return tag; }
-            public bool IsEqual(Object value) { return this.value == value; }
-            public bool IsEqual(string tag) { return this.tag == tag; }
-        }
-
-        private static List<ObjectContainer> container = new List<ObjectContainer>();
+        public static Dictionary<string, Object> container = new Dictionary<string, Object>();
 
         /// <summary>
         /// Use this function to add object reference to the world reference handler
         /// </summary>
         /// <param name="value">The class reference you need to store</param>
-        public static void Add(Object value) { container.Add(new ObjectContainer(value, value.ToString())); }
+        public static void Add(Object value) => container.Add(value.name, value);
 
         /// <summary>
         /// Use this function to add object reference to the world reference handler
@@ -34,7 +23,13 @@ namespace Knockback.Handlers
         {
             if (DuplicateCheck(tag))
                 return;
-            container.Add(new ObjectContainer(value, tag));
+            container.Add(tag, value);
+        }
+
+        public static void PrintAllValues()
+        {
+            foreach (var temp in container)
+                Debug.Log($"{temp.Key}, {temp.Value}");
         }
 
         /// <summary>
@@ -43,11 +38,9 @@ namespace Knockback.Handlers
         /// <param name="value">The class reference you need to remove</param>
         public static void Remove(Object value)
         {
-            for (int index = 0; index < container.Count; index++)
-            {
-                if (container[index].IsEqual(value))
-                    container.RemoveAt(index);
-            }
+            string key = FindTag(value);
+            if (key != null)
+                container.Remove(key);
         }
 
         /// <summary>
@@ -56,11 +49,8 @@ namespace Knockback.Handlers
         /// <param name="tag">The tag you want to remove</param>
         public static void Remove(string tag)
         {
-            for (int index = 0; index < container.Count; index++)
-            {
-                if (container[index].IsEqual(tag))
-                    container.RemoveAt(index);
-            }
+            if (container.ContainsKey(tag))
+                container.Remove(tag);
         }
 
         /// <summary>
@@ -69,11 +59,9 @@ namespace Knockback.Handlers
         /// <param name="value"></param>
         public static void RemoveAll<T>() where T : class
         {
-            for (int index = 0; index < container.Count; index++)
-            {
-                if (container[index].GetValue() is T)
-                    container.RemoveAt(index);
-            }
+            foreach (string tag in container.Keys)
+                if (container[tag] is T)
+                    container.Remove(tag);
         }
 
         /// <summary>
@@ -83,10 +71,9 @@ namespace Knockback.Handlers
         /// <returns></returns>
         public static Object GetReference(string tag)
         {
-            foreach (var temp in container)
-                if (temp.IsEqual(tag))
-                    return temp.GetValue();
-            return null;
+            if (!container.ContainsKey(tag))
+                return null;
+            return container[tag];
         }
 
         /// <summary>
@@ -98,14 +85,12 @@ namespace Knockback.Handlers
         public static bool GetReference<T>(out T value) where T : class
         {
             value = null;
-            foreach (var temp in container)
-            {
-                if (temp.GetValue() is T)
+            foreach (string tag in container.Keys)
+                if (container[tag] is T)
                 {
-                    value = temp.GetValue() as T;
+                    value = container[tag] as T;
                     return true;
                 }
-            }
             return false;
         }
 
@@ -118,19 +103,11 @@ namespace Knockback.Handlers
         /// <returns></returns>
         public static bool GetReference<T>(string tag, out T value) where T : class
         {
-            bool flag = false;
             value = null;
-
-            foreach (var temp in container)
-            {
-                if (temp.IsEqual(tag))
-                {
-                    value = temp.GetValue() as T;
-                    flag = true;
-                    break;
-                }
-            }
-            return flag;
+            if (!container.ContainsKey(tag))
+                return false;
+            value = container[tag] as T;
+            return true;
         }
 
         /// <summary>
@@ -142,33 +119,37 @@ namespace Knockback.Handlers
         public static bool GetReferences<T>(out List<T> value) where T : class
         {
             bool flag = false;
-            List<T> tempArray = new List<T>();
+            value = new List<T>();
 
-            foreach (var temp in container)
-            {
-                if (temp.GetValue() is T)
+            foreach (string tag in container.Keys)
+                if (container[tag] is T)
                 {
-                    tempArray.Add(temp.GetValue() as T);
+                    value.Add(container[tag] as T);
                     flag = true;
                 }
-            }
-            value = tempArray;
             return flag;
         }
 
+        public static bool CheckIfReferenceExists(Object value) => container.ContainsValue(value);
 
+        public static bool CheckIfReferenceExists(string tag) => container.ContainsKey(tag);
 
         private static bool DuplicateCheck(string tag)
         {
-            foreach (var temp in container)
+            if (container.ContainsKey(tag))
             {
-                if (temp.IsEqual(tag))
-                {
-                    Debug.LogWarning($"Duplicate found!! With tag name : {tag}");
-                    return true;
-                }
+                Debug.LogError($"Found duplicate key :{tag}");
+                return true;
             }
             return false;
+        }
+
+        private static string FindTag(Object value)
+        {
+            foreach (var temp in container)
+                if (temp.Value == value)
+                    return temp.Key;
+            return null;
         }
     }
 }

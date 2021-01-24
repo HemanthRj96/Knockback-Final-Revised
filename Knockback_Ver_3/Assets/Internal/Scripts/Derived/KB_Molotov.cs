@@ -30,6 +30,7 @@ namespace Knockback.Derived
         {
             if (!canUse)
                 return;
+            base.source = source;
             RemoveFromInventory(source);
             Throw(transform.rotation * Vector2.right, throwVelocity);
         }

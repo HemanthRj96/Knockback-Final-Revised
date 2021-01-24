@@ -1,95 +1,177 @@
 ﻿using UnityEngine;
 using Knockback.Utility;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using Knockback.Helpers;
 
 namespace Knockback.Handlers
 {
     //todo: Commenting
-    [RequireComponent(typeof(Canvas))]
     public class KB_CanvasGroupHandler : MonoBehaviour
     {
+        //** --INTERNAL CLASSES--
+
+        [System.Serializable]
+        internal class _CanvasGroups
+        {
+            public bool m_activeByDefault = false;
+            public GameObject m_canvasGroup = null;
+        }
+
+        [System.Serializable]
+        internal class _ButtonLookup
+        {
+            public Button m_targetButton = null;
+            public string m_buttonName = null;
+            public GameObject m_parentCanvasGroup = null;
+            public bool m_shouldSelfDeactivate = true;
+            public GameObject m_targetCanvasGroup = null;
+            public GameObject m_targetAction = null;
+        }
+
+        //** --SERIALIZED ATTRIBUTES--
+
         [Header("UI handler backend settings")]
         [Space]
+        [SerializeField] private bool m_activateExternally = false;
+        [SerializeField] private string m_canvasGroupHandlerName = "_CanvasGroupHandler_";
+        [SerializeField] private List<_CanvasGroups> m_canvasGroupList = new List<_CanvasGroups>();
+        [SerializeField] private List<_ButtonLookup> m_buttonList = new List<_ButtonLookup>();
 
-        [SerializeField] private bool autoActivate = false;
-        [SerializeField] private List<_CanvasGroups> targetCanvasGroups = new List<_CanvasGroups>();
-        [SerializeField] private List<_ButtonLookup> buttonCollections = new List<_ButtonLookup>();
 
         private int activeCanvasGroupIndex = -1;
 
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
+
+        /// <summary>
+        /// Call this method to prevent the canvas to be bootstrapped externally
+        /// </summary>
+        public void BootstrapExternally()
+        {
+            if (m_activateExternally)
+                CanvasBootstrapper();
+        }
+
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Calls camera bootstrapper on awake
+        /// </summary>
         private void Awake()
         {
-            KB_EventHandler.AddEvent("CANVAS_GROUP_HANDLER", CanvasUpdate);
-            if (autoActivate)
-                InitCanvas();
+            if (m_activateExternally)
+                DeactivateAllCanvas();
+            else
+                CanvasBootstrapper();
         }
 
-        private void InitCanvas()
+        /// <summary>
+        /// Method to deactivate all the canvas groups
+        /// </summary>
+        private void DeactivateAllCanvas()
         {
-            if (GetActiveCanvas() == null)
-                ActivateCanvas(0);
+            foreach (var canvas in m_canvasGroupList)
+                DeactivateCanvasGroup(canvas.m_canvasGroup);
         }
 
+        /// <summary>
+        /// Remove the event from event handler
+        /// </summary>
+        private void OnDestroy() => KB_EventHandler.RemoveEvent(m_canvasGroupHandlerName);
+
+        /// <summary>
+        /// Activate canvas groups that should be active by default
+        /// </summary>
+        private void CanvasBootstrapper()
+        {
+            KB_EventHandler.AddEvent(m_canvasGroupHandlerName, CanvasUpdate);
+            ButtonBootstrapper();
+
+            foreach (var canvasGroup in m_canvasGroupList)
+            {
+                if (canvasGroup.m_activeByDefault)
+                    canvasGroup.m_canvasGroup.SetActive(true);
+                else
+                    canvasGroup.m_canvasGroup.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Dynamically binds all the button to the correct method
+        /// </summary>
+        private void ButtonBootstrapper()
+        {
+            KB_CanvasGroupButtonBinder tempBinder = null;
+            foreach (var buttonLookup in m_buttonList)
+            {
+                tempBinder = buttonLookup.m_targetButton.gameObject.AddComponent<KB_CanvasGroupButtonBinder>();
+                tempBinder.m_targetEventTag = m_canvasGroupHandlerName;
+                tempBinder.m_buttonName = buttonLookup.m_buttonName;
+                buttonLookup.m_targetButton.onClick.AddListener(tempBinder.OnButtonClick);
+            }
+        }
+
+        /// <summary>
+        /// Called by the buttons whenenver they are clicked
+        /// </summary>
+        /// <param name="message">Message has string as data</param>
         private void CanvasUpdate(IMessage message)
         {
-            UICanvasButtons buttonType;
-            buttonType = (UICanvasButtons)message.data;
-            foreach (_ButtonLookup button in buttonCollections)
+            string buttonName = message.data as string;
+            _ButtonLookup buttonLookup = FindButton(buttonName);
+
+            if (buttonLookup == null)
+                return;
+
+            if (buttonLookup.m_shouldSelfDeactivate)
+                DeactivateCanvasGroup(buttonLookup.m_parentCanvasGroup);
+            ActivateCanvasGroup(buttonLookup.m_targetCanvasGroup);
+            if (buttonLookup.m_targetAction != null)
             {
-                if (button.buttontype == buttonType)
+                if (!buttonLookup.m_targetAction.activeSelf)
                 {
-                    int targetCanvasGroupIndex = GetCanvasIndex(button.targetCanvasGroup);
-                    if (targetCanvasGroupIndex == -1)
-                        return;
-                    if (activeCanvasGroupIndex == -1)
-                        activeCanvasGroupIndex = GetActiveCanvasIndex();
-
-                    DeactivateCanvas(activeCanvasGroupIndex);
-                    ActivateCanvas(targetCanvasGroupIndex);
-                    activeCanvasGroupIndex = targetCanvasGroupIndex;
+                    GameObject actionInstance = Instantiate(buttonLookup.m_targetAction);
+                    actionInstance.GetComponent<IUIAction>().DoAction();
                 }
+                else
+                    buttonLookup.m_targetAction.GetComponent<IUIAction>().DoAction();
             }
         }
 
-        private void ActivateCanvas(int canvasGroupIndex) => targetCanvasGroups[canvasGroupIndex].gameObject.SetActive(true);
-
-        private void DeactivateCanvas(int canvasGroupIndex) => targetCanvasGroups[canvasGroupIndex].gameObject.SetActive(false);
-
-        private int GetCanvasIndex(UICanvasGroups canvasGroupType)
+        /// <summary>
+        /// Helper method to find button from the button list
+        /// </summary>
+        /// <param name="buttonName">Name of the button</param>
+        private _ButtonLookup FindButton(string buttonName)
         {
-            for (int i = 0; i < targetCanvasGroups.Count; i++)
-            {
-                if (targetCanvasGroups[i].groupType == canvasGroupType)
-                    return i;
-            }
-            Debug.Log("Didn't find the target id");
-            return -1;
-        }
-
-        private _CanvasGroups GetActiveCanvas()
-        {
-            foreach (_CanvasGroups canvas in targetCanvasGroups)
-                if (canvas.gameObject.activeInHierarchy)
-                    return canvas;
+            foreach (var temp in m_buttonList)
+                if (temp.m_buttonName == buttonName)
+                    return temp;
             return null;
         }
 
-        private int GetActiveCanvasIndex() => GetCanvasIndex(GetActiveCanvas().groupType);
+        /// <summary>
+        /// Method to activate the target canvas group if it exists
+        /// </summary>
+        /// <param name="tag">Name of the canvas group</param>
+        private void ActivateCanvasGroup(GameObject canvasGroup)
+        {
+            if (canvasGroup == null)
+                return;
+            canvasGroup.SetActive(true);
+        }
 
-    }
-
-    [System.Serializable]
-    public class _CanvasGroups
-    {
-        public GameObject gameObject { get { return canvasGroupType.gameObject; } }
-        public Canvas canvasGroupType = null;
-        public UICanvasGroups groupType;
-    }
-
-    [System.Serializable]
-    public class _ButtonLookup
-    {
-        public UICanvasButtons buttontype;
-        public UICanvasGroups targetCanvasGroup;
+        /// <summary>
+        /// Method to deactivate the canvas group if it exists
+        /// </summary>
+        /// <param name="tag">Name of the canvas group</param>
+        private void DeactivateCanvasGroup(GameObject canvasGroup)
+        {
+            if (canvasGroup == null)
+                return;
+            canvasGroup?.SetActive(false);
+        }
     }
 }
