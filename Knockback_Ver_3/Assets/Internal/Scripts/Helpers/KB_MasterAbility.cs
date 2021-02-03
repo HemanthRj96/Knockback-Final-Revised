@@ -8,6 +8,9 @@ using Knockback.Controllers;
 
 namespace Knockback.Helpers
 {
+    /// <summary>
+    /// This is container class for abilities, it is used by abilityInjector classes for injecting the abilities 
+    /// </summary>
     [System.Serializable]
     public class KB_MasterAbility
     {
@@ -15,14 +18,14 @@ namespace Knockback.Helpers
         //** --ATTRIBUTES--
         //** --SERIALIZED ATTRIBUTES--
 
-        [SerializeField] private List<KB_AbilityBlueprint> abilities;
-        [SerializeField] private float duration;
+        [SerializeField] private List<KB_AbilityBlueprint> m_abilities;
+        [SerializeField] private float m_duration;
 
         //** --PRIVATE ATTIRBUTES--
 
-        private KB_PlayerController controller;
-        private Action abilityBeginFunctionCallback = null;
-        private Action abilityEndFunctionCallback = null;
+        private KB_PlayerController m_controller;
+        private Action m_abilityBeginFunctionCallback = null;
+        private Action m_abilityEndFunctionCallback = null;
 
 
         //** --METHODS--
@@ -35,9 +38,9 @@ namespace Knockback.Helpers
         /// <param name="abilityEndFunctionCallback">Optional callback function</param>
         public void StartAbilityRoutine(KB_PlayerController controller, Action abilityBeginFunctionCallback = null, Action abilityEndFunctionCallback = null)
         {
-            this.controller = controller;
-            this.abilityBeginFunctionCallback = abilityBeginFunctionCallback;
-            this.abilityEndFunctionCallback = abilityEndFunctionCallback;
+            m_controller = controller;
+            m_abilityBeginFunctionCallback = abilityBeginFunctionCallback;
+            m_abilityEndFunctionCallback = abilityEndFunctionCallback;
             KB_GameHandler.instance.StartCoroutine(AbilityRoutine());
         }
 
@@ -49,11 +52,11 @@ namespace Knockback.Helpers
         private IEnumerator AbilityRoutine()
         {
             SetPlayerTarget();
-            abilityBeginFunctionCallback?.Invoke();
+            m_abilityBeginFunctionCallback?.Invoke();
             ActivateAbilities();
-            yield return new WaitForSecondsRealtime(duration);
+            yield return new WaitForSecondsRealtime(m_duration);
             DeactivateAbilities();
-            abilityEndFunctionCallback?.Invoke();
+            m_abilityEndFunctionCallback?.Invoke();
         }
 
         /// <summary>
@@ -61,7 +64,7 @@ namespace Knockback.Helpers
         /// </summary>
         private void ActivateAbilities()
         {
-            foreach(var ability in abilities)
+            foreach(var ability in m_abilities)
                 ability.ApplyAbility();
         }
 
@@ -70,7 +73,7 @@ namespace Knockback.Helpers
         /// </summary>
         private void DeactivateAbilities()
         {
-            foreach(var ability in abilities)
+            foreach(var ability in m_abilities)
                 ability.RemoveAbility();
         }
 
@@ -79,8 +82,8 @@ namespace Knockback.Helpers
         /// </summary>
         private void SetPlayerTarget()
         {
-            foreach (var ability in abilities)
-                ability.SetTargetPlayer(controller);
+            foreach (var ability in m_abilities)
+                ability.SetTargetPlayer(m_controller);
         }
     }
 }

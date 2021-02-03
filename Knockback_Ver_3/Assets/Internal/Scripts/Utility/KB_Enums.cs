@@ -1,12 +1,14 @@
 ﻿namespace Knockback.Utility
 {
-
+    
+    // Used in ItemSlot class
     public enum ItemSlotType
     {
         Pickup,
         Inventory
     }
 
+    // Used in splash damage class
     public enum SplashDamageType
     {
         DefaultNull,
@@ -16,11 +18,13 @@
         lingeringExplosion
     }
 
+    //todo: Obselete enum - LevelNames
     public enum LevelNames
     {
         DefaultNull
     }
 
+    // Used in PlayerStats class
     public enum ArmourTypes
     {
         DefaultNull,
@@ -29,12 +33,14 @@
         type_3
     }
 
+    //todo: Obselete enum - AbilityType
     public enum AbilityType
     {
         consumable,
         nonConsumable
     }
 
+    //todo: Obselete enum - UICanvasButtons
     public enum UICanvasButtons
     {
         defaultNull,
@@ -52,6 +58,7 @@
         button_5
     }
 
+    //todo: Obselete enum - UICanvasGroups
     public enum UICanvasGroups
     {
         defaultNull,
@@ -65,6 +72,7 @@
         miscMenu_4
     }
 
+    // Used in InputSettings class
     public enum InputType
     {
         defaultNull,
@@ -72,6 +80,7 @@
         Touch
     }
 
+    // Used in PlayerBackendSettings class
     public enum PlayerBackendSettingType
     {
         defaultNull,
@@ -84,6 +93,7 @@
         dashingDistance
     }
 
+    // Enum for maintaining a reference for all layers used in the game
     public enum Layers
     {
         defaulNull = 0,

@@ -44,7 +44,7 @@ namespace Knockback.Helpers
             {
                 foreach (var tempSlot in tempSlots)
                 {
-                    if (tempSlot.itemSlotType == ItemSlotType.Inventory)
+                    if (tempSlot.m_itemSlotType == ItemSlotType.Inventory)
                     {
                         m_inventorySlots.Add(tempSlot);
                         tempSlot.SetState(true);
@@ -58,7 +58,7 @@ namespace Knockback.Helpers
                     }
                 }
 
-                m_inventorySlots = m_inventorySlots.OrderBy(temp => temp.slotId).ToList();
+                m_inventorySlots = m_inventorySlots.OrderBy(temp => temp.m_slotId).ToList();
                 m_canUse = true;
                 m_bootstrapped = true;
             }
@@ -102,8 +102,8 @@ namespace Knockback.Helpers
         public int GetCurrentlySelectedSlot()
         {
             foreach (var slot in m_inventorySlots)
-                if (slot.isSelected)
-                    return slot.slotId;
+                if (slot.m_isSelected)
+                    return slot.m_slotId;
             return -1;
         }
 
@@ -126,7 +126,7 @@ namespace Knockback.Helpers
                 return;
             }
 
-            if (!m_canUse || m_pickupSlot.isFull)
+            if (!m_canUse || m_pickupSlot.m_isFull)
                 return;
 
             m_pickupSlot.SetItemSlot(container);
@@ -139,7 +139,7 @@ namespace Knockback.Helpers
         /// <param name="container"></param>
         public void RemovePickup(KB_ItemContainer container)
         {
-            if (!m_canUse || !m_pickupSlot.isFull)
+            if (!m_canUse || !m_pickupSlot.m_isFull)
                 return;
 
             m_pickupSlot.ResetItemSlot();
@@ -159,7 +159,7 @@ namespace Knockback.Helpers
 
             if (m_currentIndex == m_newIndex)
             {
-                if (m_inventorySlots[m_currentIndex].isFull)
+                if (m_inventorySlots[m_currentIndex].m_isFull)
                     ItemRemover(m_currentIndex);
                 ItemAdder(container, m_newIndex, true);
                 EnableItemRoutine(m_inventorySlots[m_newIndex]);
@@ -186,7 +186,7 @@ namespace Knockback.Helpers
                 return;
             }
 
-            ItemRemover(targetSlot.slotId);
+            ItemRemover(targetSlot.m_slotId);
         }
 
 
@@ -207,23 +207,23 @@ namespace Knockback.Helpers
             if (m_currentIndex == -1)
             {
                 m_inventorySlots[m_newIndex].SelectSlot();
-                if (m_inventorySlots[m_newIndex].isFull)
+                if (m_inventorySlots[m_newIndex].m_isFull)
                     EnableItemRoutine(m_inventorySlots[m_newIndex]);
             }
             else if (m_currentIndex == m_newIndex)
             {
                 m_inventorySlots[m_newIndex].DeselectSlot();
-                if (m_inventorySlots[m_newIndex].isFull)
+                if (m_inventorySlots[m_newIndex].m_isFull)
                     ItemRemover(m_newIndex);
             }
             else
             {
                 m_inventorySlots[m_currentIndex].DeselectSlot();
-                if (m_inventorySlots[m_currentIndex].isFull)
+                if (m_inventorySlots[m_currentIndex].m_isFull)
                     DisableItemRoutine(m_inventorySlots[m_currentIndex]);
 
                 m_inventorySlots[m_newIndex].SelectSlot();
-                if (m_inventorySlots[m_newIndex].isFull)
+                if (m_inventorySlots[m_newIndex].m_isFull)
                     EnableItemRoutine(m_inventorySlots[m_newIndex]);
             }
         }
@@ -351,7 +351,7 @@ namespace Knockback.Helpers
             int index = 0;
             foreach (var slot in m_inventorySlots)
             {
-                if (slot.isFull)
+                if (slot.m_isFull)
                 {
                     DestroyChildIcon(slot);
                     DetachItem(slot.GetContainer());
@@ -404,8 +404,8 @@ namespace Knockback.Helpers
         private int GetEmptySlot()
         {
             foreach (var slot in m_inventorySlots)
-                if (!slot.isFull)
-                    return slot.slotId;
+                if (!slot.m_isFull)
+                    return slot.m_slotId;
             return -1;
         }
 
@@ -416,7 +416,7 @@ namespace Knockback.Helpers
         /// <param name="iconPrefab">Icon prefab</param>
         private void SpawnIconAsChild(KB_ItemSlot slot, GameObject iconPrefab)
         {
-            if (!slot.isFull)
+            if (!slot.m_isFull)
                 return;
             GameObject.Instantiate(iconPrefab, slot.transform);
         }

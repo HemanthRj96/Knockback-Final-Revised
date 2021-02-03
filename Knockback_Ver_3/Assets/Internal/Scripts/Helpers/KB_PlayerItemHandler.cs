@@ -4,26 +4,45 @@ using Knockback.Utility;
 
 namespace Knockback.Helpers
 {
+    //todo: Minor implementation - KB_PlayerItemHandler
+
+    /// <summary>
+    /// This class implements logic for using any item that is active in the playerInventory
+    /// </summary>
     public class KB_PlayerItemHandler
     {
+        //** --CONSTRUCTORS--
+
         public KB_PlayerItemHandler() { }
-        public KB_PlayerItemHandler(KB_PlayerController controlledActor) => this.controlledActor = controlledActor;
+        public KB_PlayerItemHandler(KB_PlayerController controlledActor) => m_controlledActor = controlledActor;
 
-        private KB_PlayerController controlledActor;
+        //** --ATTRIBUTES--
+        //** --PRIVATE ATTRIBUTES--
 
-        private GameObject item = null;
+        private KB_PlayerController m_controlledActor;
+        private GameObject m_item = null;
 
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
-        public void UseWeapon(bool value)
+        /// <summary>
+        /// Call this method to use the active item in the inventory
+        /// </summary>
+        /// <param name="value"></param>
+        public void UseItem(bool value)
         {
             if (!value)
                 return;
-            if (controlledActor.m_cachedWeaponSlot.childCount == 0)
+            if (m_controlledActor.m_cachedWeaponSlot.childCount == 0)
                 return;
 
-           // Get the item from the inventory and use it
+            // Get the item from the inventory and use it
         }
 
-        private void Use(IUsableEntity item) { item.UseItem(controlledActor.gameObject); }
+        /// <summary>
+        /// Helper method to use the target item
+        /// </summary>
+        /// <param name="item">Target item to be used</param>
+        private void Use(IUsableEntity item) => item.UseItem(m_controlledActor.gameObject);
     }
 }

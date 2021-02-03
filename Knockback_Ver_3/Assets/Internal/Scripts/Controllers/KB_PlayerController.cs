@@ -112,7 +112,7 @@ namespace Knockback.Controllers
                 return true;
             else
             {
-                new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {m_cachedSpriteRenderer}{m_cachedRigidbody}");
+                Debug.LogError($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {m_cachedSpriteRenderer}{m_cachedRigidbody}");
                 return false;
             }
         }
@@ -177,7 +177,7 @@ namespace Knockback.Controllers
         private void OfflineInputUpdate()
         {
             locomotionHandler.Jump(inputSettings.JumpInput());
-            itemHandler.UseWeapon(inputSettings.FireInput());
+            itemHandler.UseItem(inputSettings.FireInput());
         }
 
         /// <summary>

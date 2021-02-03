@@ -4,88 +4,132 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace Knockback.Helpers
 {
+    /// <summary>
+    /// Class holds the resposibilty for UI handling for inventory and pickup items
+    /// </summary>
     public class KB_ItemSlot : MonoBehaviour
     {
-        #region --Attributes--
-
+        //** --ATTRIBUTES--
+        //** --PUBLIC ATTRIBUTES--
 
         [Header("Item slot deafult settings")]
         [Space]
+        public ItemSlotType m_itemSlotType = 0;
+        public int m_slotId = 0;
 
-        public ItemSlotType itemSlotType = 0;
-        public int slotId = 0;
+        //** --SERIALIZED ATTRIBUTES--
 
-        [SerializeField] private Image cachedImage = null;
-        [SerializeField] private Button cachedButton = null;
-        [SerializeField] private Sprite onSelectSprite = null;
-        [SerializeField] private Sprite onDeselectSprite = null;
+        [SerializeField] private Image m_cachedImage = null;
+        [SerializeField] private Button m_cachedButton = null;
+        [SerializeField] private Sprite m_onSelectSprite = null;
+        [SerializeField] private Sprite m_onDeselectSprite = null;
 
-        private KB_ItemContainer itemContainer = null;
-        private Action<int> buttonClickAction = delegate { };
+        //** --PRIVATE ATTRIBUTES--
 
-        public bool isFull => itemContainer != null;
-        public bool isSelected { get; private set; } = false;
+        private KB_ItemContainer m_itemContainer = null;
+        private Action<int> m_buttonClickAction = delegate { };
 
+        //** --PUBLIC REFERENCES--
 
-        #endregion --Attributes--
+        public bool m_isFull => m_itemContainer != null;
+        public bool m_isSelected { get; private set; } = false;
 
-        #region --Private functions--
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
+        /// <summary>
+        /// Method to select this slot
+        /// </summary>
+        public void SelectSlot()
+        {
+            // Debug.Log("Select slot " + slotId);
+            SwitchSprites(m_onSelectSprite);
+            m_isSelected = true;
+        }
 
+        /// <summary>
+        /// Method to deselect this slot
+        /// </summary>
+        public void DeselectSlot()
+        {
+            // Debug.Log("Deselect slot " + slotId);
+            SwitchSprites(m_onDeselectSprite);
+            m_isSelected = false;
+        }
+
+        /// <summary>
+        /// Method to activate or deactivate this gameObject
+        /// </summary>
+        /// <param name="isActive"></param>
+        public void SetState(bool isActive = false) => gameObject.SetActive(isActive);
+
+        /// <summary>
+        /// Method to set the action
+        /// </summary>
+        /// <param name="action"></param>
+        public void SetAction(Action<int> action) => m_buttonClickAction = action;
+
+        /// <summary>
+        /// Method to reset the action
+        /// </summary>
+        public void ResetAction() => m_buttonClickAction = delegate { };
+
+        /// <summary>
+        /// Method to set the item slot
+        /// </summary>
+        /// <param name="container"></param>
+        public void SetItemSlot(KB_ItemContainer container) => m_itemContainer = container;
+
+        /// <summary>
+        /// Method to reset the item slot
+        /// </summary>
+        public void ResetItemSlot() => m_itemContainer = null;
+
+        /// <summary>
+        /// Returns the item container
+        /// </summary>
+        public KB_ItemContainer GetContainer() => m_itemContainer;
+
+        /// <summary>
+        /// Returns the button component of this ItemSlot
+        /// </summary>
+        /// <returns></returns>
+        public Button GetButton() => m_cachedButton;
+
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Call bootstrap on Awake
+        /// </summary>
         private void Awake() => BootStrap();
 
+        /// <summary>
+        /// Method implements all the bootstrapping routines
+        /// </summary>
         private void BootStrap()
         {
-            cachedButton.onClick.AddListener(OnButtonClick);
-            onDeselectSprite = cachedImage.sprite;
+            m_cachedButton.onClick.AddListener(OnButtonClick);
+            m_onDeselectSprite = m_cachedImage.sprite;
             KB_ReferenceHandler.Add(this);
             SetState(false);
         }
 
+        /// <summary>
+        /// This method is used to switch sprites of the itemSlot
+        /// </summary>
+        /// <param name="targetSprite">Target sprite to use</param>
         private void SwitchSprites(Sprite targetSprite)
         {
-            if (cachedImage == null)
+            if (m_cachedImage == null)
                 return;
-            cachedImage.sprite = targetSprite;
+            m_cachedImage.sprite = targetSprite;
         }
 
-
-        #endregion --Private functions--
-
-        #region --Public functions--
-
-
-        public void SelectSlot()
-        {
-            // Debug.Log("Select slot " + slotId);
-            SwitchSprites(onSelectSprite);
-            isSelected = true;
-        }
-
-        public void DeselectSlot()
-        {
-            // Debug.Log("Deselect slot " + slotId);
-            SwitchSprites(onDeselectSprite);
-            isSelected = false;
-        }
-
-        public void SetState(bool isActive = false) => gameObject.SetActive(isActive);
-
-        public void SetAction(Action<int> action) => buttonClickAction = action;
-        public void ResetAction() => buttonClickAction = delegate { };
-
-        public void SetItemSlot(KB_ItemContainer container) => itemContainer = container;
-        public void ResetItemSlot() => itemContainer = null;
-
-        public KB_ItemContainer GetContainer() => itemContainer;
-        public Button GetButton() => cachedButton;
-
-        public void OnButtonClick() => buttonClickAction.Invoke(slotId);
-
-
-        #endregion --Public functions--
+        /// <summary>
+        /// This method is automatically invoked upon buttonClick
+        /// </summary>
+        private void OnButtonClick() => m_buttonClickAction.Invoke(m_slotId);
     }
 }

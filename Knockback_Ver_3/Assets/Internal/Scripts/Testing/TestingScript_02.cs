@@ -1,4 +1,5 @@
-﻿using Knockback.Utility;
+﻿using Knockback.Core;
+using Knockback.Utility;
 using UnityEngine;
 
 namespace Knockback.Testing

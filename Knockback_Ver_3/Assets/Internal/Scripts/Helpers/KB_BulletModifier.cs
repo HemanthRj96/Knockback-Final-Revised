@@ -1,9 +1,13 @@
-﻿using Knockback.Utility;
+﻿using Knockback.Core;
+using Knockback.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Knockback.Helpers
 {
+    /// <summary>
+    /// This class implements bullet dynamics such as passthrough and ricochet and more if desired
+    /// </summary>
     public class KB_BulletModifier : MonoBehaviour
     {
         //** --ATTRIBUTES-- 

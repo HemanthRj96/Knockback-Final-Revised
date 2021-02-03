@@ -1,20 +1,23 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 namespace Knockback.Helpers
 {
+    //todo: Implementation - KB_ButtonAnimator
+
+    /// <summary>
+    /// Method for animating buttons
+    /// </summary>
     public class KB_ButtonAnimator : MonoBehaviour
     {
-        [SerializeField]private Button m_button= null;
+        [SerializeField] private Button m_button = null;
 
         private void Awake()
         {
             if (m_button == null)
                 TryGetComponent(out m_button);
-            
-            
+
+
         }
 
         private void TestFunction()

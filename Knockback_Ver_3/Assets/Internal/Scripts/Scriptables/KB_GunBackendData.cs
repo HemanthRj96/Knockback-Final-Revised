@@ -1,12 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Knockback.Scriptables
 {
+    /// <summary>
+    /// ScriptableObject for backend data for guns, changing parameters in this object creates variations of guns
+    /// </summary>
     [CreateAssetMenu(fileName = "Gun Data", menuName = "Data/Gun data")]
     public class KB_GunBackendData : ScriptableObject
     {
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
+
         [Header("Gun settings")]
         [Space]
         public string gunClass;

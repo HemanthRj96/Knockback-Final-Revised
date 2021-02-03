@@ -2,18 +2,9 @@
 
 namespace Knockback.Utility
 {
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public interface IPlayerController
-    {
-
-    }
-
     /// <summary>
     /// <para> Add this interface to any class that can be interacted and used </para>
-    /// Compatible scripts : any weapon scripts
+    /// Compatible scripts : any items that can be used
     /// </summary>
     public interface IUsableEntity
     {
@@ -22,7 +13,8 @@ namespace Knockback.Utility
     }
 
     /// <summary>
-    /// Derive this interface to objects that can be interacted by the player
+    /// <para> Derive this interface to objects that can be interacted by the player </para>
+    /// Compatible scripts : any item that has Interactability script attached
     /// </summary>
     public interface IInteractableEntity
     {
@@ -32,7 +24,8 @@ namespace Knockback.Utility
     }
 
     /// <summary>
-    /// Derive this to any objects that can take damage
+    /// <para> Derive this to any objects that can take damage </para>
+    /// Compatible scripts : any item that can take damage
     /// </summary>
     public interface IDamage
     {
@@ -41,7 +34,7 @@ namespace Knockback.Utility
     }
 
     /// <summary>
-    /// 
+    /// This interface is used as a function parameter for custom events
     /// </summary>
     public interface IMessage
     {
@@ -50,9 +43,11 @@ namespace Knockback.Utility
         float timeUntilActivation { get; set; }
     }
 
+    /// <summary>
+    /// This interface is used for calling custom actions or routine of operations
+    /// </summary>
     public interface IUIAction
     {
         void DoAction(IMessage _message = null);
     }
-
 }

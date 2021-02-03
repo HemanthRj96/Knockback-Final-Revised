@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Knockback.Utility
 {
+    /// <summary>
+    /// This class includes all the extension methods
+    /// </summary>
     public static class KB_ExtensionMethods
     {
         /// <summary>
@@ -16,7 +19,6 @@ namespace Knockback.Utility
             targetTransform.rotation = finalTransform.rotation;
         }
 
-
         /// <summary>
         /// Returns an array of child transforms
         /// </summary>
@@ -29,6 +31,12 @@ namespace Knockback.Utility
             return children.ToArray();
         }
 
+        /// <summary>
+        /// Returns an randomly generated Id
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="length">Length of the Id</param>
+        /// <returns></returns>
         public static int GenerateId<T>(this T obj, int length = 5)
         {
             length = Mathf.Clamp(length, 3, 8);
@@ -37,15 +45,27 @@ namespace Knockback.Utility
             return Random.Range(minValue, maxValue);
         }
 
-        public static LayerMask CreateLayerMask(this LayerMask layerMask, int[] layers, bool blockOrIgnore = false)
+        /// <summary>
+        /// Create a layer mask
+        /// </summary>
+        /// <param name="layerMask"></param>
+        /// <param name="layers">All the target layers</param>
+        /// <param name="ignoreOrBlock">Set true for an ignore mask and false for a blocking mask</param>
+        public static LayerMask CreateLayerMask(this LayerMask layerMask, int[] layers, bool ignoreOrBlock = false)
         {
             foreach (int i in layers)
                 layerMask = 1 << i;
-            if (blockOrIgnore == true)
+            if (ignoreOrBlock == true)
                 layerMask = ~layerMask;
             return layerMask;
         }
 
+        /// <summary>
+        /// Returns a unit direction vector
+        /// </summary>
+        /// <param name="inputVector">Target vector</param>
+        /// <param name="relativeTo">Relative vector</param>
+        /// <returns></returns>
         public static Vector2 GetDirectionOfVector(this Vector2 inputVector, Vector2 relativeTo)
         {
             Vector2 difference = relativeTo - inputVector;
@@ -53,8 +73,14 @@ namespace Knockback.Utility
             return difference;
         }
 
+        /// <summary>
+        /// Returns a float angle from a unit vector
+        /// </summary>
+        /// <param name="directionVector"></param>
+        /// <returns></returns>
         public static float GetAngleOfRotationFromDirection(this Vector2 directionVector)
         {
+            directionVector.Normalize();
             return Mathf.Atan2(directionVector.y, directionVector.x) * Mathf.Rad2Deg;
         }
     }

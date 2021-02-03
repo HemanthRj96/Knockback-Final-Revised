@@ -28,7 +28,7 @@ namespace Knockback.Derived
 
         protected override void OnStartAbility()
         {
-            m_cachedValue = controller.GetSettings().moveSpeed;
+            m_cachedValue = controller.GetSettings().m_moveSpeed;
             controller.ModifySettings(m_settingType, new dynamic[] { m_cachedValue * m_percentageModifier / 100 });
         }
 

@@ -88,7 +88,7 @@ namespace Knockback.Handlers
         {
             if (!m_poolCollection.ContainsKey(tag))
             {
-                new KBLog("--INVALID TAG--", 1);
+                Debug.LogError("--INVALID TAG--");
                 return null;
             }
 
