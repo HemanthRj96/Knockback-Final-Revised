@@ -6,21 +6,26 @@ namespace Knockback.Handlers
     /// <summary>
     /// Database handlers are used to save and load data offline if necessary and more data type can be added
     /// </summary>
-    public class KB_DatabaseHandler : MonoBehaviour
+    public class KB_DatabaseHandler
     {
+        //** --ATTRIBUTES--
+        //** ---PRIVATE ATTRIBUTES--
+
         private static readonly string TARGET_DIRECTORY = "/KnockbackDataBase.knockback";
 
-        // Create object refernces here
-        private PlayerSaveData playerSaveData = new PlayerSaveData();
-        private JoystickSaveData joystickSaveData = new JoystickSaveData();
-        private GameStateData gameStateData = new GameStateData();
+        private PlayerSaveData m_playerSaveData = new PlayerSaveData();
+        private JoystickSaveData m_joystickSaveData = new JoystickSaveData();
+        private GameStateData m_gameStateData = new GameStateData();
 
-        // Getter for the object references
-        public ref PlayerSaveData GetPlayerData() { return ref playerSaveData; }
-        public ref JoystickSaveData GetJoystickData() { return ref joystickSaveData; }
-        public ref GameStateData GetGameStateData() { return ref gameStateData; }
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
-        // Getter for the target directory
+        /// <summary>
+        /// All getter methods for the data
+        /// </summary>
+        public ref PlayerSaveData GetPlayerData() { return ref m_playerSaveData; }
+        public ref JoystickSaveData GetJoystickData() { return ref m_joystickSaveData; }
+        public ref GameStateData GetGameStateData() { return ref m_gameStateData; }
         public static string GetTargetDirectory() { return TARGET_DIRECTORY; }
     }
 

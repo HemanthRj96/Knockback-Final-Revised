@@ -5,12 +5,20 @@ using UnityEngine;
 
 namespace Knockback.Core
 {
+    /// <summary>
+    /// This class implements a basic projectile type splash damage system, therefore this class should be inherited 
+    /// for further feature expansion
+    /// </summary>
     public class KB_ThrowableCore : KB_SplashDamageCore
     {
+        //** --ATTRIBUTES--
+        //** --PROTECTED ATTRIBUTES--
 
-        protected Rigidbody2D rb;
+        protected Rigidbody2D m_rb;
 
-        private void Awake() { rb = GetComponent<Rigidbody2D>(); }
+
+        //** --METHODS--
+        //** --PROTECTED METHODS--
 
         /// <summary>
         /// Method to throw the projectile with direction and velocity
@@ -19,7 +27,7 @@ namespace Knockback.Core
         /// <param name="velocity">Velocity of the projectile</param>
         protected void Throw(Vector3 direction, float velocity, float timeUntil = 0, bool shouldUseTimer = false)
         {
-            rb.velocity = direction * velocity;
+            m_rb.velocity = direction * velocity;
             if (shouldUseTimer)
                 StartCoroutine(StartTimer(timeUntil));
             OnThrow();
@@ -36,17 +44,44 @@ namespace Knockback.Core
         protected virtual void OnTimerEnd() { return; }
 
         /// <summary>
-        /// Override this function to implement logic when the object makes collision
+        /// Override this function to implement logic when this object makes a collision with something
         /// </summary>
         protected virtual void OnHit(Collision2D collider) { return; }
 
+        /// <summary>
+        /// Override this function to implement logic when an object triggers the volume
+        /// </summary>
+        /// <param name="collider"></param>
+        protected virtual void OnTriggered(Collider2D collider) { return; }
 
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Initialize rigidBody
+        /// </summary>
+        private void Awake() => m_rb = GetComponent<Rigidbody2D>();
+
+        /// <summary>
+        /// Timer coroutine
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         private IEnumerator StartTimer(float time)
         {
             yield return new WaitForSecondsRealtime(time);
             OnTimerEnd();
         }
 
-        private void OnCollisionEnter2D(Collision2D collider) { OnHit(collider); }
+        /// <summary>
+        /// Call OnHit on making collision
+        /// </summary>
+        /// <param name="collider"></param>
+        private void OnCollisionEnter2D(Collision2D collider) => OnHit(collider);
+
+        /// <summary>
+        /// Call OnTriggered when triggered by the volume
+        /// </summary>
+        /// <param name="collider"></param>
+        private void OnTriggerEnter2D(Collider2D collider) => OnTriggered(collider);
     }
 }

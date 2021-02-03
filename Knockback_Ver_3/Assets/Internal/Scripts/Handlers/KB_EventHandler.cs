@@ -5,8 +5,13 @@ using UnityEngine;
 
 namespace Knockback.Handlers
 {
+    /// <summary>
+    /// This class implements custom event handles with or without custom data
+    /// </summary>
     public static class KB_EventHandler
     {   
+        //** --INTERNAL CLASS--
+
         /// <summary>
         /// Internal class for data injection
         /// </summary>
@@ -23,18 +28,15 @@ namespace Knockback.Handlers
             public float timeUntilActivation { get; set; }
         }
 
+        //** --ATTRIBUTES--
+        //** --PRIVATE ATTRIBUTES--
 
-        private static IMessage message = null;
-        private static Dictionary<string, Action<IMessage>> _eventCollection = new Dictionary<string, Action<IMessage>>();
+        private static IMessage m_message = null;
+        private static Dictionary<string, Action<IMessage>> m_eventCollection = new Dictionary<string, Action<IMessage>>();
 
-        /// <summary>
-        /// Constructor method
-        /// </summary>
-        /// <param name="_message"></param>
-        private static void Construct(IMessage _message)
-        {
-            message = _message;
-        }
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
         /// <summary>
         /// Method to add events; If the method tag already exists then the method is automatically subscribed to the listener
@@ -46,13 +48,13 @@ namespace Knockback.Handlers
             if (_event == null)
                 return;
 
-            if (_eventCollection.ContainsKey(tag))
+            if (m_eventCollection.ContainsKey(tag))
             {
-                _eventCollection[tag] += _event;
+                m_eventCollection[tag] += _event;
             }
             else
             {
-                _eventCollection.Add(tag, _event);
+                m_eventCollection.Add(tag, _event);
             }
         }
 
@@ -62,10 +64,10 @@ namespace Knockback.Handlers
         /// <param name="tag"></param>
         public static void RemoveEvent(string tag)
         {
-            if (!_eventCollection.ContainsKey(tag))
+            if (!m_eventCollection.ContainsKey(tag))
                 return;
 
-            _eventCollection.Remove(tag);
+            m_eventCollection.Remove(tag);
         }
 
         /// <summary>
@@ -76,11 +78,11 @@ namespace Knockback.Handlers
         /// <param name="_event"></param>
         public static void RemoveListener(string tag, Action<IMessage> _event)
         {
-            if (!_eventCollection.ContainsKey(tag))
+            if (!m_eventCollection.ContainsKey(tag))
                 return;
-            _eventCollection[tag] -= _event;
-            if (_eventCollection[tag] == null)
-                _eventCollection.Remove(tag);
+            m_eventCollection[tag] -= _event;
+            if (m_eventCollection[tag] == null)
+                m_eventCollection.Remove(tag);
         }
 
         /// <summary>
@@ -91,11 +93,19 @@ namespace Knockback.Handlers
         /// <param name="_source"></param>
         /// <param name="_timeUntilActivation"></param>
         public static void Invoke(string tag, object _data = null, GameObject _source = null, float _timeUntilActivation = 0)
-        {            
-            if (!_eventCollection.ContainsKey(tag))
+        {
+            if (!m_eventCollection.ContainsKey(tag))
                 return;
             Construct(new Message(_data, _source, _timeUntilActivation));
-            _eventCollection[tag]?.Invoke(message);
+            m_eventCollection[tag]?.Invoke(m_message);
         }
+
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Constructor method
+        /// </summary>
+        /// <param name="_message"></param>
+        private static void Construct(IMessage _message) => m_message = _message;
     }
 }

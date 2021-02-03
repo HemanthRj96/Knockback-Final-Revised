@@ -10,28 +10,28 @@ namespace Knockback.Helpers
 {
     public class KB_InventoryHandler
     {
+        //** --CONSTRUCTORS--
+
         public KB_InventoryHandler() { }
-        public KB_InventoryHandler(KB_PlayerController controlledActor) => this.controlledActor = controlledActor;
+        public KB_InventoryHandler(KB_PlayerController controlledActor) => this.m_controlledActor = controlledActor;
+
+        //** --ATTRIBUTES--
+        //** --PRIVATE ATTRIBUTES--
 
         private const int _INVENTORY_SIZE = 4;
 
-        //** Player controller
-        private KB_PlayerController controlledActor = null;
+        private List<KB_ItemSlot> m_inventorySlots = new List<KB_ItemSlot>();
+        private KB_ItemSlot m_pickupSlot = null;
+        private KB_PlayerController m_controlledActor = null;
+        private int m_currentIndex;
+        private int m_newIndex;
+        private bool m_canUse = false;
+        private bool m_bootstrapped = false;
+        private int m_bootstrapLoopCounter = 0;
 
-        //** Item Buffer
-        private List<KB_ItemContainer> itemBuffer = new List<KB_ItemContainer>();
-        private KB_ItemContainer activeItem = null;
 
-        //** Item Slots
-        private List<KB_ItemSlot> inventorySlots = new List<KB_ItemSlot>();
-        private KB_ItemSlot pickupSlot = null;
-
-        //** Other variables
-        private int currentIndex;
-        private int newIndex;
-        private bool canUse = false;
-        private bool bootstrapped = false;
-        private int bootstrapLoopCounter = 0;
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
         /// <summary>
         /// Method to initialize pickup and inventory slots
@@ -46,21 +46,21 @@ namespace Knockback.Helpers
                 {
                     if (tempSlot.itemSlotType == ItemSlotType.Inventory)
                     {
-                        inventorySlots.Add(tempSlot);
+                        m_inventorySlots.Add(tempSlot);
                         tempSlot.SetState(true);
                         tempSlot.SetAction(InventorySlotFunctionCallThrough);
                     }
-                    else if (pickupSlot == null)
+                    else if (m_pickupSlot == null)
                     {
-                        pickupSlot = tempSlot;
+                        m_pickupSlot = tempSlot;
                         tempSlot.SetState(true);
                         tempSlot.SetAction(PickupSlotFunctionCallThrough);
                     }
                 }
 
-                inventorySlots = inventorySlots.OrderBy(temp => temp.slotId).ToList();
-                canUse = true;
-                bootstrapped = true;
+                m_inventorySlots = m_inventorySlots.OrderBy(temp => temp.slotId).ToList();
+                m_canUse = true;
+                m_bootstrapped = true;
             }
             else
                 Debug.Log("Unable to find slots from reference handler");
@@ -73,21 +73,21 @@ namespace Knockback.Helpers
         {
             try
             {
-                foreach (var slot in inventorySlots)
+                foreach (var slot in m_inventorySlots)
                 {
                     slot.ResetAction();
                     slot.ResetItemSlot();
                     slot.SetState();
                 }
-                pickupSlot.ResetAction();
-                pickupSlot.ResetItemSlot();
-                pickupSlot.SetState();
+                m_pickupSlot.ResetAction();
+                m_pickupSlot.ResetItemSlot();
+                m_pickupSlot.SetState();
 
-                inventorySlots.Clear();
-                pickupSlot = null;
+                m_inventorySlots.Clear();
+                m_pickupSlot = null;
 
-                canUse = false;
-                bootstrapped = false;
+                m_canUse = false;
+                m_bootstrapped = false;
             }
             catch (Exception excc)
             {
@@ -101,7 +101,7 @@ namespace Knockback.Helpers
         /// <returns>Returns -1 if there is no slot selected</returns>
         public int GetCurrentlySelectedSlot()
         {
-            foreach (var slot in inventorySlots)
+            foreach (var slot in m_inventorySlots)
                 if (slot.isSelected)
                     return slot.slotId;
             return -1;
@@ -113,24 +113,24 @@ namespace Knockback.Helpers
         /// <param name="container"></param>
         public void TryPickup(KB_ItemContainer container)
         {
-            if (!bootstrapped)
+            if (!m_bootstrapped)
             {
                 TrySlotLoad();
-                if (bootstrapLoopCounter == 2)
+                if (m_bootstrapLoopCounter == 2)
                 {
                     Debug.LogError("BOOTSTRAP LOOP ERROR");
                     return;
                 }
-                ++bootstrapLoopCounter;
+                ++m_bootstrapLoopCounter;
                 TryPickup(container);
                 return;
             }
 
-            if (!canUse || pickupSlot.isFull)
+            if (!m_canUse || m_pickupSlot.isFull)
                 return;
 
-            pickupSlot.SetItemSlot(container);
-            SpawnIconAsChild(pickupSlot, container.GetIconPrefab());
+            m_pickupSlot.SetItemSlot(container);
+            SpawnIconAsChild(m_pickupSlot, container.GetIconPrefab());
         }
 
         /// <summary>
@@ -139,11 +139,11 @@ namespace Knockback.Helpers
         /// <param name="container"></param>
         public void RemovePickup(KB_ItemContainer container)
         {
-            if (!canUse || !pickupSlot.isFull)
+            if (!m_canUse || !m_pickupSlot.isFull)
                 return;
 
-            pickupSlot.ResetItemSlot();
-            DestroyChildIcon(pickupSlot);
+            m_pickupSlot.ResetItemSlot();
+            DestroyChildIcon(m_pickupSlot);
         }
 
         /// <summary>
@@ -151,22 +151,22 @@ namespace Knockback.Helpers
         /// </summary>
         public void AddItemToInventoryExternally(KB_ItemContainer container, int index)
         {
-            if (!canUse || index >= inventorySlots.Count)
+            if (!m_canUse || index >= m_inventorySlots.Count)
                 return;
 
-            newIndex = index;
-            currentIndex = GetCurrentlySelectedSlot();
+            m_newIndex = index;
+            m_currentIndex = GetCurrentlySelectedSlot();
 
-            if (currentIndex == newIndex)
+            if (m_currentIndex == m_newIndex)
             {
-                if (inventorySlots[currentIndex].isFull)
-                    ItemRemover(currentIndex);
-                ItemAdder(container, newIndex, true);
-                EnableItemRoutine(inventorySlots[newIndex]);
+                if (m_inventorySlots[m_currentIndex].isFull)
+                    ItemRemover(m_currentIndex);
+                ItemAdder(container, m_newIndex, true);
+                EnableItemRoutine(m_inventorySlots[m_newIndex]);
             }
             else
             {
-                ItemAdder(container, newIndex, false);
+                ItemAdder(container, m_newIndex, false);
             }
         }
 
@@ -175,10 +175,10 @@ namespace Knockback.Helpers
         /// </summary>
         public void RemoveItemFromInventory(KB_ItemContainer container, bool canInteract = true)
         {
-            if (!canUse)
+            if (!m_canUse)
                 return;
 
-            KB_ItemSlot targetSlot = inventorySlots.Find(x => x.GetContainer() == container);
+            KB_ItemSlot targetSlot = m_inventorySlots.Find(x => x.GetContainer() == container);
 
             if (targetSlot == null)
             {
@@ -189,39 +189,42 @@ namespace Knockback.Helpers
             ItemRemover(targetSlot.slotId);
         }
 
+
+        //** --PRIVATE METHODS--
+
         /// <summary>
         /// This is the function invoked by the inventory slots if the player interacts with it
         /// </summary>
         /// <param name="index"></param>
         private void InventorySlotFunctionCallThrough(int index)
         {
-            if (newIndex >= inventorySlots.Count)
+            if (m_newIndex >= m_inventorySlots.Count)
                 return;
 
-            newIndex = index;
-            currentIndex = GetCurrentlySelectedSlot();
+            m_newIndex = index;
+            m_currentIndex = GetCurrentlySelectedSlot();
 
-            if (currentIndex == -1)
+            if (m_currentIndex == -1)
             {
-                inventorySlots[newIndex].SelectSlot();
-                if (inventorySlots[newIndex].isFull)
-                    EnableItemRoutine(inventorySlots[newIndex]);
+                m_inventorySlots[m_newIndex].SelectSlot();
+                if (m_inventorySlots[m_newIndex].isFull)
+                    EnableItemRoutine(m_inventorySlots[m_newIndex]);
             }
-            else if (currentIndex == newIndex)
+            else if (m_currentIndex == m_newIndex)
             {
-                inventorySlots[newIndex].DeselectSlot();
-                if (inventorySlots[newIndex].isFull)
-                    ItemRemover(newIndex);
+                m_inventorySlots[m_newIndex].DeselectSlot();
+                if (m_inventorySlots[m_newIndex].isFull)
+                    ItemRemover(m_newIndex);
             }
             else
             {
-                inventorySlots[currentIndex].DeselectSlot();
-                if (inventorySlots[currentIndex].isFull)
-                    DisableItemRoutine(inventorySlots[currentIndex]);
+                m_inventorySlots[m_currentIndex].DeselectSlot();
+                if (m_inventorySlots[m_currentIndex].isFull)
+                    DisableItemRoutine(m_inventorySlots[m_currentIndex]);
 
-                inventorySlots[newIndex].SelectSlot();
-                if (inventorySlots[newIndex].isFull)
-                    EnableItemRoutine(inventorySlots[newIndex]);
+                m_inventorySlots[m_newIndex].SelectSlot();
+                if (m_inventorySlots[m_newIndex].isFull)
+                    EnableItemRoutine(m_inventorySlots[m_newIndex]);
             }
         }
 
@@ -231,46 +234,46 @@ namespace Knockback.Helpers
         /// <param name="_invalidParameter_"></param>
         private void PickupSlotFunctionCallThrough(int _invalidParameter_)
         {
-            if (pickupSlot.GetContainer() == null)
+            if (m_pickupSlot.GetContainer() == null)
                 return;
 
-            pickupSlot.GetContainer().SetItemUser(controlledActor.gameObject);
+            m_pickupSlot.GetContainer().SetItemUser(m_controlledActor.gameObject);
 
             int emptyIndex = GetEmptySlot();
-            currentIndex = GetCurrentlySelectedSlot();
+            m_currentIndex = GetCurrentlySelectedSlot();
 
-            Debug.Log($"{emptyIndex} : {currentIndex}");
+            Debug.Log($"{emptyIndex} : {m_currentIndex}");
 
             if (emptyIndex == -1)
             {
-                if (currentIndex != -1)
+                if (m_currentIndex != -1)
                 {
-                    ItemRemover(currentIndex);
-                    ItemAdder(pickupSlot.GetContainer(), currentIndex, true);
-                    pickupSlot.ResetItemSlot();
-                    DestroyChildIcon(pickupSlot);
+                    ItemRemover(m_currentIndex);
+                    ItemAdder(m_pickupSlot.GetContainer(), m_currentIndex, true);
+                    m_pickupSlot.ResetItemSlot();
+                    DestroyChildIcon(m_pickupSlot);
                 }
                 else
                 {
                     ItemRemover(0);
-                    ItemAdder(pickupSlot.GetContainer(), 0, false);
-                    pickupSlot.ResetItemSlot();
-                    DestroyChildIcon(pickupSlot);
+                    ItemAdder(m_pickupSlot.GetContainer(), 0, false);
+                    m_pickupSlot.ResetItemSlot();
+                    DestroyChildIcon(m_pickupSlot);
                 }
             }
             else
             {
-                if (currentIndex == emptyIndex)
+                if (m_currentIndex == emptyIndex)
                 {
-                    ItemAdder(pickupSlot.GetContainer(), emptyIndex, true);
-                    pickupSlot.ResetItemSlot();
-                    DestroyChildIcon(pickupSlot);
+                    ItemAdder(m_pickupSlot.GetContainer(), emptyIndex, true);
+                    m_pickupSlot.ResetItemSlot();
+                    DestroyChildIcon(m_pickupSlot);
                 }
                 else
                 {
-                    ItemAdder(pickupSlot.GetContainer(), emptyIndex, false);
-                    pickupSlot.ResetItemSlot();
-                    DestroyChildIcon(pickupSlot);
+                    ItemAdder(m_pickupSlot.GetContainer(), emptyIndex, false);
+                    m_pickupSlot.ResetItemSlot();
+                    DestroyChildIcon(m_pickupSlot);
                 }
             }
         }
@@ -281,16 +284,16 @@ namespace Knockback.Helpers
         /// <param name="targetIndex"></param>
         private void ItemRemover(int targetIndex)
         {
-            if (targetIndex >= inventorySlots.Count)
+            if (targetIndex >= m_inventorySlots.Count)
             {
                 Debug.LogError("Out of bounds");
                 return;
             }
-            DetachItem(inventorySlots[targetIndex].GetContainer());
-            DestroyChildIcon(inventorySlots[targetIndex]);
-            RemoveItemRoutine(inventorySlots[targetIndex]);
-            inventorySlots[targetIndex].GetContainer().SetItemUser(null);
-            inventorySlots[targetIndex].ResetItemSlot();
+            DetachItem(m_inventorySlots[targetIndex].GetContainer());
+            DestroyChildIcon(m_inventorySlots[targetIndex]);
+            RemoveItemRoutine(m_inventorySlots[targetIndex]);
+            m_inventorySlots[targetIndex].GetContainer().SetItemUser(null);
+            m_inventorySlots[targetIndex].ResetItemSlot();
         }
 
         /// <summary>
@@ -301,18 +304,18 @@ namespace Knockback.Helpers
         /// <param name="shouldEnable"></param>
         private void ItemAdder(KB_ItemContainer container, int targetIndex, bool shouldEnable)
         {
-            if(targetIndex >= inventorySlots.Count)
+            if(targetIndex >= m_inventorySlots.Count)
             {
                 Debug.LogError("Out of bounds");
                 return;
             }
-            inventorySlots[targetIndex].SetItemSlot(container);
-            SpawnIconAsChild(inventorySlots[targetIndex], inventorySlots[targetIndex].GetContainer().GetIconPrefab());
-            AttachItem(inventorySlots[targetIndex].GetContainer());
+            m_inventorySlots[targetIndex].SetItemSlot(container);
+            SpawnIconAsChild(m_inventorySlots[targetIndex], m_inventorySlots[targetIndex].GetContainer().GetIconPrefab());
+            AttachItem(m_inventorySlots[targetIndex].GetContainer());
             if (shouldEnable)
-                EnableItemRoutine(inventorySlots[targetIndex]);
+                EnableItemRoutine(m_inventorySlots[targetIndex]);
             else
-                DisableItemRoutine(inventorySlots[targetIndex]);
+                DisableItemRoutine(m_inventorySlots[targetIndex]);
         }
 
         /// <summary>
@@ -323,10 +326,10 @@ namespace Knockback.Helpers
         {
             container.GetItem().GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
             container.GetItem().GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
-            container.GetItem().transform.parent = controlledActor.cachedWeaponSlot;
+            container.GetItem().transform.parent = m_controlledActor.m_cachedWeaponSlot;
 
-            container.GetItem().transform.position = controlledActor.cachedWeaponSlot.position;
-            container.GetItem().transform.rotation = controlledActor.cachedWeaponSlot.rotation;
+            container.GetItem().transform.position = m_controlledActor.m_cachedWeaponSlot.position;
+            container.GetItem().transform.rotation = m_controlledActor.m_cachedWeaponSlot.rotation;
         }
 
         /// <summary>
@@ -346,7 +349,7 @@ namespace Knockback.Helpers
         private void DiscardAllInventoryItems()
         {
             int index = 0;
-            foreach (var slot in inventorySlots)
+            foreach (var slot in m_inventorySlots)
             {
                 if (slot.isFull)
                 {
@@ -400,7 +403,7 @@ namespace Knockback.Helpers
         /// <returns></returns>
         private int GetEmptySlot()
         {
-            foreach (var slot in inventorySlots)
+            foreach (var slot in m_inventorySlots)
                 if (!slot.isFull)
                     return slot.slotId;
             return -1;
@@ -427,6 +430,5 @@ namespace Knockback.Helpers
             try { GameObject.Destroy(slot.transform.GetChild(0).gameObject); }
             catch (Exception exc) { Debug.Log(exc); }
         }
-
     }
 }

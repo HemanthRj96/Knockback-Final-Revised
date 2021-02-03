@@ -33,7 +33,7 @@ namespace Knockback.Helpers
 
         public void DisableObject() => gameObject.SetActive(false);
 
-        public void SetUsability(bool canUse) => gameObject.GetComponent<IUsableEntity>().canUse = canUse;
+        public void SetUsability(bool canUse) => gameObject.GetComponent<IUsableEntity>().i_canUse = canUse;
 
         public void SetInteractability(bool canInteract) => this.canInteract = canInteract;
 

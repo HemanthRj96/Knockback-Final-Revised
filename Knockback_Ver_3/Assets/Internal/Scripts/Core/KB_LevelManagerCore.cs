@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using Mirror;
 using System.Collections;
-using System;
 using UnityEngine.SceneManagement;
 using Knockback.Handlers;
 
 namespace Knockback.Core
 {
+    /// <summary>
+    /// Generic level manager class for handling all routines in a target scene therefore, this class should be 
+    /// inherited inorder to make it custom for each scene
+    /// </summary>
     public class KB_LevelManagerCore : MonoBehaviour
     {
         //** --ATTRIBUTES--
@@ -48,7 +51,6 @@ namespace Knockback.Core
             return tempInstance.GetComponent<KB_LevelManagerCore>();
         }
 
-
         /// <summary>
         /// Call this method first to loadup the manager
         /// </summary>
@@ -78,7 +80,6 @@ namespace Knockback.Core
                 UnloadScene(delayInSeconds);
                 KB_ReferenceHandler.Remove(m_levelManagerName);
                 StartCoroutine(LateDeactivator(true));
-
             }
             else
             {

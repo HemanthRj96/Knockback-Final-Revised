@@ -10,7 +10,7 @@ public class TestingScript_02 : MonoBehaviour, IUsableEntity
     [SerializeField] private float velocity;
     [SerializeField] private float impactDamage;
 
-    public bool canUse { get; set; } = true;
+    public bool i_canUse { get; set; } = true;
 
 
     private GameObject bulletInstance;

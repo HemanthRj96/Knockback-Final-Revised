@@ -16,18 +16,18 @@ namespace Knockback.Core
 
         public class GunData
         {
-            public int totalRounds;
-            public int activeRounds;
-            public int roundCapacity;
-            public readonly string gunClass;
-            public readonly int gunId;
+            public int im_totalRounds;
+            public int im_activeRounds;
+            public int im_roundCapacity;
+            public readonly string im_gunClass;
+            public readonly int im_gunId;
 
 
             public GunData() { }
             public GunData(string gunClass, int gunId)
             {
-                this.gunClass = gunClass;
-                this.gunId = gunId;
+                im_gunClass = gunClass;
+                im_gunId = gunId;
             }
         }
 
@@ -35,40 +35,40 @@ namespace Knockback.Core
         //** --SERIALIZED ATTRIBUTES--
 
         [Header("Gun core backend settings")]
-        [SerializeField] private string gunSettingsResourceFetchString;
-        [SerializeField] private string bulletPrefabResourceFetchString;
-        [SerializeField] private KB_GunBackendData _gunSettings = null;
-        [SerializeField] private GameObject bulletPrefab = null;
-        [SerializeField] private Transform projectileTransform = null;
-        [SerializeField] private int poolSize = 0;
-        [SerializeField] private string poolName = "BulletPool_";
+        [SerializeField] private string m_gunSettingsResourceFetchString;
+        [SerializeField] private string m_bulletPrefabResourceFetchString;
+        [SerializeField] private KB_GunBackendData m_gunSettings = null;
+        [SerializeField] private GameObject m_bulletPrefab = null;
+        [SerializeField] private Transform m_projectileTransform = null;
+        [SerializeField] private int m_poolSize = 0;
+        [SerializeField] private string m_poolName = "BulletPool_";
 
         //** --PRIVATE ATTRIBUTES--
 
-        private float projectileVelocity = 0;
-        private float impactDamage = 0;
-        private float firingCooldown = 0;
-        private float reloadTime = 0;
-        private float gunRecoil = 0;
-        private float cameraShakeIntensity = 0;
-        private bool canFire = true;
-        private bool isEmpty = false;
-        private bool isReloadComplete = true;
-        private bool isReloading = false;
+        private float m_projectileVelocity = 0;
+        private float m_impactDamage = 0;
+        private float m_firingCooldown = 0;
+        private float m_reloadTime = 0;
+        private float m_gunRecoil = 0;
+        private float m_cameraShakeIntensity = 0;
+        private bool m_canFire = true;
+        private bool m_isEmpty = false;
+        private bool m_isReloadComplete = true;
+        private bool m_isReloading = false;
         private const int _MAXIMUM_BULLETS = 269;
-        private GameObject user = null;
-        private GunData _gunData = null;
-        private KB_CameraController cameraController = null;
+        private GameObject m_user = null;
+        private GunData m_gunData = null;
+        private KB_CameraController m_cameraController = null;
 
         //** --PRIVATE REFERENCES--
 
-        private Vector2 firingDirection => projectileTransform.rotation * Vector2.right;
+        private Vector2 m_firingDirection => m_projectileTransform.rotation * Vector2.right;
 
         //** --PUBLIC REFERENCES--
 
-        public KB_GunBackendData gunSettings { get { return _gunSettings; } }
-        public bool canUse { get; set; }
-        public GunData gunData { get { return _gunData; } }
+        public KB_GunBackendData gunSettings { get { return m_gunSettings; } }
+        public bool i_canUse { get; set; }
+        public GunData gunData { get { return m_gunData; } }
 
 
         //** --METHODS--
@@ -80,10 +80,10 @@ namespace Knockback.Core
         /// <param name="user">Owner off this item</param>
         public void UseItem(GameObject user)
         {
-            if (!canUse)
+            if (!i_canUse)
                 return;
-            if (this.user == null || this.user != user)
-                this.user = user;
+            if (this.m_user == null || this.m_user != user)
+                this.m_user = user;
 
             FireGun();
         }
@@ -97,7 +97,7 @@ namespace Knockback.Core
             if (!CanMerge(targetItem))
                 return;
             KB_GunCore gun = targetItem.GetComponent<KB_GunCore>();
-            int additionalRounds = gun.gunData.totalRounds + gun.gunData.activeRounds;
+            int additionalRounds = gun.gunData.im_totalRounds + gun.gunData.im_activeRounds;
             AddAmmo(additionalRounds);
             Destroy(targetItem);
         }
@@ -135,21 +135,21 @@ namespace Knockback.Core
         /// </summary>
         private void Bootstrap()
         {
-            _gunData = new GunData(_gunSettings.gunClass, _gunSettings.gunId);
-            _gunData.roundCapacity = _gunSettings.roundCapacity;
-            _gunData.totalRounds = _gunSettings.totalRounds;
-            _gunData.activeRounds = _gunSettings.roundCapacity;
+            m_gunData = new GunData(m_gunSettings.gunClass, m_gunSettings.gunId);
+            m_gunData.im_roundCapacity = m_gunSettings.roundCapacity;
+            m_gunData.im_totalRounds = m_gunSettings.totalRounds;
+            m_gunData.im_activeRounds = m_gunSettings.roundCapacity;
 
-            projectileVelocity = _gunSettings.projectileVelocity;
-            impactDamage = _gunSettings.impactDamage;
-            firingCooldown = 60 / _gunSettings.bulletRoundsPerMinute;
-            reloadTime = _gunSettings.reloadTime;
-            gunRecoil = _gunSettings.gunRecoil;
-            cameraShakeIntensity = _gunSettings.cameraShakeIntensity;
+            m_projectileVelocity = m_gunSettings.projectileVelocity;
+            m_impactDamage = m_gunSettings.impactDamage;
+            m_firingCooldown = 60 / m_gunSettings.bulletRoundsPerMinute;
+            m_reloadTime = m_gunSettings.reloadTime;
+            m_gunRecoil = m_gunSettings.gunRecoil;
+            m_cameraShakeIntensity = m_gunSettings.cameraShakeIntensity;
 
             CreateBulletPool();
 
-            KB_ReferenceHandler.GetReference("MainCameraController", out cameraController);
+            KB_ReferenceHandler.GetReference("MainCameraController", out m_cameraController);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Knockback.Core
         /// </summary>
         private void FireGun()
         {
-            if (!canFire)
+            if (!m_canFire)
                 return;
 
             if (ShouldReload())
@@ -165,8 +165,8 @@ namespace Knockback.Core
             else
             {
                 ShootingCooldown();
-                --_gunData.activeRounds;
-                SpawnBulletFromPool(projectileTransform, firingDirection, projectileVelocity, impactDamage);
+                --m_gunData.im_activeRounds;
+                SpawnBulletFromPool(m_projectileTransform, m_firingDirection, m_projectileVelocity, m_impactDamage);
 
                 //ApplyPlayerKnockback();
                 //ShakeCamera();
@@ -177,25 +177,25 @@ namespace Knockback.Core
         /// Returns true if the gun should reload
         /// </summary>
         /// <returns></returns>
-        private bool ShouldReload() => (!isReloadComplete) && (_gunData.activeRounds <= 0);
+        private bool ShouldReload() => (!m_isReloadComplete) && (m_gunData.im_activeRounds <= 0);
 
         /// <summary>
         /// Method to reload the gun
         /// </summary>
         private void ReloadGun()
         {
-            if (isEmpty)
+            if (m_isEmpty)
             {
-                if (_gunData.activeRounds == 0)
+                if (m_gunData.im_activeRounds == 0)
                     DestroyPool();
                 return;
             }
-            if (!(_gunData.totalRounds > 0))
+            if (!(m_gunData.im_totalRounds > 0))
             {
-                isEmpty = true;
+                m_isEmpty = true;
                 return;
             }
-            if (!isReloading)
+            if (!m_isReloading)
                 StartCoroutine(DoReload());
         }
 
@@ -218,32 +218,32 @@ namespace Knockback.Core
         /// <param name="impactDamage">Impact damage of the bullet</param>
         private void SpawnBulletFromPool(Transform projectileTransform, Vector2 direction, float velocity, float impactDamage)
         {
-            GameObject bulletInstance = KB_PoolHandler.instance.GetFromPool(poolName);
+            GameObject bulletInstance = KB_PoolHandler.instance.GetFromPool(m_poolName);
             bulletInstance.transform.CopyPositionAndRotation(projectileTransform);
 
             bulletInstance.GetComponent<KB_BulletCore>().SetBulletParameters(impactDamage, direction, velocity);
-            bulletInstance.GetComponent<IUsableEntity>().UseItem(user);
+            bulletInstance.GetComponent<IUsableEntity>().UseItem(m_user);
         }
 
         /// <summary>
         /// Method to apply player knockback
         /// </summary>
-        private void ApplyPlayerKnockback() => user.GetComponent<KB_PlayerController>().knockbackHandler.CauseKnockback(gunRecoil, -firingDirection);
+        private void ApplyPlayerKnockback() => m_user.GetComponent<KB_PlayerController>()?.knockbackHandler.CauseKnockback(m_gunRecoil, -m_firingDirection);
 
         /// <summary>
         /// Method to shake the camera
         /// </summary>
         private void ShakeCamera()
         {
-            if (cameraController == null)
+            if (m_cameraController == null)
             {
-                if (KB_ReferenceHandler.GetReference("MainCameraController", out cameraController))
+                if (KB_ReferenceHandler.GetReference("MainCameraController", out m_cameraController))
                 {
-                    cameraController.ShakeCameraWithMagnitude(cameraShakeIntensity);
+                    m_cameraController.ShakeCameraWithMagnitude(m_cameraShakeIntensity);
                     return;
                 }
             }
-            cameraController?.ShakeCameraWithMagnitude(cameraShakeIntensity);
+            m_cameraController?.ShakeCameraWithMagnitude(m_cameraShakeIntensity);
         }
 
         /// <summary>
@@ -251,30 +251,30 @@ namespace Knockback.Core
         /// </summary>
         private void CreateBulletPool()
         {
-            if (bulletPrefab == null)
+            if (m_bulletPrefab == null)
             {
                 Debug.LogError("BULLET PREFAB IS NULL");
                 return;
             }
-            if (KB_PoolHandler.instance.DoesPoolExist(poolName + bulletPrefab.name))
+            if (KB_PoolHandler.instance.DoesPoolExist(m_poolName + m_bulletPrefab.name))
                 return;
 
-            KB_PoolHandler.instance.CreatePool((poolName + bulletPrefab.name), bulletPrefab, poolSize);
+            KB_PoolHandler.instance.CreatePool((m_poolName + m_bulletPrefab.name), m_bulletPrefab, m_poolSize);
         }
 
         /// <summary>
         /// Method to destroy the bullet pool
         /// </summary>
-        private void DestroyPool() => KB_PoolHandler.instance.DestroyPool(poolName + bulletPrefab.name);
+        private void DestroyPool() => KB_PoolHandler.instance.DestroyPool(m_poolName + m_bulletPrefab.name);
 
         /// <summary>
         /// Cool down coroutine
         /// </summary>
         private IEnumerator Cooldown()
         {
-            canFire = false;
-            yield return new WaitForSecondsRealtime(firingCooldown);
-            canFire = true;
+            m_canFire = false;
+            yield return new WaitForSecondsRealtime(m_firingCooldown);
+            m_canFire = true;
         }
 
         /// <summary>
@@ -282,31 +282,31 @@ namespace Knockback.Core
         /// </summary>
         private IEnumerator DoReload()
         {
-            isReloading = true;
-            int usedClipCount = gunData.roundCapacity - gunData.activeRounds;
+            m_isReloading = true;
+            int usedClipCount = gunData.im_roundCapacity - gunData.im_activeRounds;
 
             if (usedClipCount == 0)
             {
                 StopReload();
-                isReloading = false;
+                m_isReloading = false;
             }
-            else if (gunData.roundCapacity > gunData.totalRounds)
+            else if (gunData.im_roundCapacity > gunData.im_totalRounds)
             {
-                canFire = isReloadComplete = false;
-                yield return new WaitForSecondsRealtime(reloadTime);
-                gunData.activeRounds = gunData.totalRounds;
-                gunData.totalRounds = 0;
-                canFire = isReloadComplete = true;
-                isReloading = false;
+                m_canFire = m_isReloadComplete = false;
+                yield return new WaitForSecondsRealtime(m_reloadTime);
+                gunData.im_activeRounds = gunData.im_totalRounds;
+                gunData.im_totalRounds = 0;
+                m_canFire = m_isReloadComplete = true;
+                m_isReloading = false;
             }
             else
             {
-                canFire = isReloadComplete = false;
-                yield return new WaitForSeconds(reloadTime);
-                gunData.activeRounds = gunData.roundCapacity;
-                gunData.totalRounds = gunData.totalRounds - usedClipCount;
-                canFire = isReloadComplete = true;
-                isReloading = false;
+                m_canFire = m_isReloadComplete = false;
+                yield return new WaitForSeconds(m_reloadTime);
+                gunData.im_activeRounds = gunData.im_roundCapacity;
+                gunData.im_totalRounds = gunData.im_totalRounds - usedClipCount;
+                m_canFire = m_isReloadComplete = true;
+                m_isReloading = false;
             }
         }
 
@@ -320,8 +320,8 @@ namespace Knockback.Core
             KB_GunCore gun;
             if (!targetItem.TryGetComponent(out gun))
                 return false;
-            if (gun.gunSettings.gunClass == _gunSettings.gunClass)
-                if (gun.gunSettings.gunId == _gunSettings.gunId)
+            if (gun.gunSettings.gunClass == m_gunSettings.gunClass)
+                if (gun.gunSettings.gunId == m_gunSettings.gunId)
                     return true;
             return false;
         }
@@ -331,7 +331,7 @@ namespace Knockback.Core
         /// </summary>
         /// <param name="ammoClass">Target gunClass to be matched</param>
         /// <returns></returns>
-        private bool CanAddAmmo(string ammoClass) => _gunSettings.gunClass == ammoClass;
+        private bool CanAddAmmo(string ammoClass) => m_gunSettings.gunClass == ammoClass;
 
         /// <summary>
         /// Call this method to update the rounds externally
@@ -339,9 +339,9 @@ namespace Knockback.Core
         /// <param name="additionalRounds">Total additional rounds</param>
         private void AddAmmo(int additionalRounds)
         {
-            if (_gunData.totalRounds >= _MAXIMUM_BULLETS)
+            if (m_gunData.im_totalRounds >= _MAXIMUM_BULLETS)
                 return;
-            _gunSettings.totalRounds = Mathf.Clamp(_gunSettings.totalRounds + additionalRounds, 0, _MAXIMUM_BULLETS);
+            m_gunSettings.totalRounds = Mathf.Clamp(m_gunSettings.totalRounds + additionalRounds, 0, _MAXIMUM_BULLETS);
             return;
         }
     }

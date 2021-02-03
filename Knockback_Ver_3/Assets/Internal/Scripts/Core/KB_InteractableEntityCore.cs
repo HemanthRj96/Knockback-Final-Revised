@@ -5,32 +5,34 @@ using UnityEngine.UI;
 
 namespace Knockback.Core
 {
-    //todo: More robust implementation for advanced mechanics
+    //todo: More robust implementation for advanced mechanics - KB_InteractableEntityCore
     // This script is in a very basic form
+
+
     public class KB_InteractableEntityCore : MonoBehaviour
     {
         [Header("Broadcaster backend settings")]
         [Space]
-        [SerializeField] private int entityId = 0;
+        [SerializeField] private int m_entityId = 0;
         // Get this using reference handler
-        [SerializeField] private GameObject targetGUIGameObject;
-        [SerializeField] private string referenceHandlerString;
-        [SerializeField] private string eventIdentifierTag;
-        [SerializeField] private bool shouldCooldown = false;
+        [SerializeField] private GameObject m_targetGUIGameObject;
+        [SerializeField] private string m_referenceHandlerString;
+        [SerializeField] private string m_eventIdentifierTag;
+        [SerializeField] private bool m_shouldCooldown = false;
 
-        private bool canUse = false;
-        private bool isActive = false;
+        private bool m_canUse = false;
+        private bool m_isActive = false;
 
         private void Awake()
         {
-            if (KB_ReferenceHandler.GetReference(referenceHandlerString, out targetGUIGameObject))
-                targetGUIGameObject.GetComponent<Button>().onClick.AddListener(OnClick);
+            if (KB_ReferenceHandler.GetReference(m_referenceHandlerString, out m_targetGUIGameObject))
+                m_targetGUIGameObject.GetComponent<Button>().onClick.AddListener(OnClick);
         }
 
         private void OnClick()
         {
-            isActive = !isActive;
-            if (isActive)
+            m_isActive = !m_isActive;
+            if (m_isActive)
                 StartUse();
             else
                 StopUse();
@@ -38,24 +40,24 @@ namespace Knockback.Core
 
         private void StartUse()
         {
-            if (!canUse)
+            if (!m_canUse)
                 return;
-            KB_EventHandler.Invoke(eventIdentifierTag, true, gameObject);
+            KB_EventHandler.Invoke(m_eventIdentifierTag, true, gameObject);
         }
 
         private void StopUse()
         {
-            if (!canUse)
+            if (!m_canUse)
                 return;
-            KB_EventHandler.Invoke(eventIdentifierTag, false, gameObject);
+            KB_EventHandler.Invoke(m_eventIdentifierTag, false, gameObject);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.GetComponent<KB_PlayerController>())
             {
-                targetGUIGameObject.SetActive(true);
-                canUse = true;
+                m_targetGUIGameObject.SetActive(true);
+                m_canUse = true;
             }
         }
 
@@ -63,8 +65,8 @@ namespace Knockback.Core
         {
             if (collision.GetComponent<KB_PlayerController>())
             {
-                targetGUIGameObject.SetActive(false);
-                canUse = false;
+                m_targetGUIGameObject.SetActive(false);
+                m_canUse = false;
             }
         }
     }

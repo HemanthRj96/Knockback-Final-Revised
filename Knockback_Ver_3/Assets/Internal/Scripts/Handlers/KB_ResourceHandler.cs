@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Media;
 
 namespace Knockback.Handlers
 {
+    /// <summary>
+    /// Class handles all the resource files that are loaded during the runtime of the program
+    /// </summary>
     public static class KB_ResourceHandler
     {
-        public static ResourceCollections collectionHandle;
-        public static bool isResourceLoaded = false;
 
-        public static void LoadReasourceCollections() { collectionHandle = new ResourceCollections(); }
+        //** --INTERNAL CLASS--
 
         public class ResourceCollections
         {
@@ -56,7 +56,7 @@ namespace Knockback.Handlers
 
             private void LoadCollections()
             {
-                if (isResourceLoaded)
+                if (m_isResourceLoaded)
                     return;
                 //Sprite collection loader
                 LoadResourcesFromPath("Sprites", out Sprite[] sprites);
@@ -87,7 +87,7 @@ namespace Knockback.Handlers
                     spawnpointCollectionList.Add($"Set_{index}", spawnpointcollection);
                 }
 
-                isResourceLoaded = true;
+                m_isResourceLoaded = true;
             }
 
             private void LoadResourcesFromPath<T>(string path, out T[] outData) where T : class
@@ -119,5 +119,19 @@ namespace Knockback.Handlers
             public Dictionary<string, GameObject> GetUIGameObjectCollection() => UIObjectCollection;
             public Dictionary<string, GameObject> GetSpawnpointCollectionFromSet(string collectionSet) => spawnpointCollectionList[collectionSet];
         }
+
+        //** --ATTRIBUTES--
+        //** --PUBLIC ATTRIBUTES--
+
+        public static ResourceCollections m_collectionHandle;
+        public static bool m_isResourceLoaded = false;
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
+
+        /// <summary>
+        /// Method to laod the resource collections
+        /// </summary>
+        public static void LoadReasourceCollections() => m_collectionHandle = new ResourceCollections();
     }
 }

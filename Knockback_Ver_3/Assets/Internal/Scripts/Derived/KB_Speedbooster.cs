@@ -1,11 +1,12 @@
-﻿using Knockback.Controllers;
-using Knockback.Handlers;
-using Knockback.Scriptables;
+﻿using Knockback.Scriptables;
 using Knockback.Utility;
 using UnityEngine;
 
 namespace Knockback.Derived
 {
+    /// <summary>
+    /// Basic player speed booster script
+    /// </summary>
     [CreateAssetMenu(fileName = "SpeedBooster", menuName = "Scriptables/SpeedBooster")]
     public class KB_Speedbooster : KB_AbilityBlueprint
     {
@@ -14,12 +15,12 @@ namespace Knockback.Derived
 
         [Header("Speedbooster backend")]
         [Space]
-        [SerializeField] private float percentageModifier = 0;
+        [SerializeField] private float m_percentageModifier = 0;
 
         //** --PRIVATE ATTRIBUTES--
 
-        private float cachedValue = 0;
-        private PlayerBackendSettingType[] settingType = new PlayerBackendSettingType[] { PlayerBackendSettingType.moveSpeed };
+        private float m_cachedValue = 0;
+        private PlayerBackendSettingType[] m_settingType = new PlayerBackendSettingType[] { PlayerBackendSettingType.moveSpeed };
 
 
         //** --METHODS--
@@ -27,13 +28,13 @@ namespace Knockback.Derived
 
         protected override void OnStartAbility()
         {
-            cachedValue = controller.GetSettings().moveSpeed;
-            controller.ModifySettings(settingType, new dynamic[] { cachedValue * percentageModifier / 100 });
+            m_cachedValue = controller.GetSettings().moveSpeed;
+            controller.ModifySettings(m_settingType, new dynamic[] { m_cachedValue * m_percentageModifier / 100 });
         }
 
         protected override void OnEndAbility()
         {
-            controller.ModifySettings(settingType, new dynamic[] { cachedValue });
+            controller.ModifySettings(m_settingType, new dynamic[] { m_cachedValue });
         }
     }
 }

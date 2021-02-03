@@ -45,11 +45,11 @@ namespace Knockback.Helpers
 
             if (rotationInDegrees > 90 || rotationInDegrees < -90)
             {
-                controlledActor.cachedSpriteRenderer.flipX = true;
+                controlledActor.m_cachedSpriteRenderer.flipX = true;
                 targetRotation = Quaternion.Euler(180, 0, -rotationInDegrees);
             }
             else
-                controlledActor.cachedSpriteRenderer.flipX = false;
+                controlledActor.m_cachedSpriteRenderer.flipX = false;
 
             return targetRotation;
         }

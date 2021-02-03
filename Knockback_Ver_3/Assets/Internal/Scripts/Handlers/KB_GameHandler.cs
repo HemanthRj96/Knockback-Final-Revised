@@ -3,17 +3,28 @@ using UnityEngine;
 
 namespace Knockback.Handlers
 {
+    //todo: Implementation - KB_GameHandler
+
     /// <summary>
     /// This is the class that runs before all the class begin
     /// </summary>
     public class KB_GameHandler : KB_Singleton<KB_GameHandler>
     {
+        //** --ATTRIBUTES--
+        //** --PUBLIC ATTRIBUTES--
 
 
-        private void Start()
-        {
-            BeginBootstrap();
-        }
+        //** --PRIVATE ATTRIBUTES--
+
+        //** --PUBLIC METHODS--
+
+
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Do all the bootstrapping process here
+        /// </summary>
+        private void Start() => BeginBootstrap();
 
 
         /// <summary>
@@ -24,16 +35,20 @@ namespace Knockback.Handlers
             KB_ResourceHandler.LoadReasourceCollections();
         }
 
+        /// <summary>
+        /// All the routines before launch
+        /// </summary>
         private void PreLaunchRoutines()
         {
 
         }
 
+        /// <summary>
+        /// All the routine after the launch
+        /// </summary>
         private void PostLaunchRoutines()
         {
 
         }
-
-       // private void
     }
 }

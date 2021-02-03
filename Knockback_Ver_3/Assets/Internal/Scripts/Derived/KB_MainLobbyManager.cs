@@ -1,9 +1,12 @@
-﻿using UnityEngine;
-using System.Collections;
-using Knockback.Core;
+﻿using Knockback.Core;
 
 namespace Knockback.Derived
 {
+    //todo: Finish implementatiion - KB_MainLobbyManager
+
+    /// <summary>
+    /// Derived class for main lobby
+    /// </summary>
     public class KB_MainLobbyManager : KB_LevelManagerCore
     {
         protected override void CallOnAwake()

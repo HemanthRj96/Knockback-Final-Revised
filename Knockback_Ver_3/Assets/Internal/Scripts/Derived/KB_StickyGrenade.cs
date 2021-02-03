@@ -6,10 +6,13 @@ using Knockback.Utility;
 
 namespace Knockback.Derived
 {
+    //todo: Should implement animations and FX - KB_StickyGrenade
+    //todo: Network implementation - KB_StickyGrenade
     public class KB_StickyGrenade : KB_ThrowableCore, IUsableEntity
     {
-        //todo: Commenting :: StickyGrenade
-        //todo: Network implementation
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
+
         [Header("Sticky grenade backend settings")]
         [Space]
 
@@ -21,17 +24,33 @@ namespace Knockback.Derived
         [SerializeField] private Animator animator;
         [SerializeField] private LayerMask layerMask;
 
-        public bool canUse { get; set; } = false;
+        //** --PUBLIC ATTRIBUTES--
 
+        public bool i_canUse { get; set; } = false;
+
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
+
+        /// <summary>
+        /// Interface implementation
+        /// </summary>
+        /// <param name="source"></param>
         public void UseItem(GameObject source)
         {
-            if (!canUse)
+            if (!i_canUse)
                 return;
-            base.source = source;
+            base.m_source = source;
             RemoveFromInventory(source);
             Throw(transform.rotation * Vector2.right, throwVelocity, timeUntilExplosion, true);
         }
 
+        //** --PROTECTED METHODS--
+        
+        /// <summary>
+        /// Attach the sticky grenade to the point of collision
+        /// </summary>
+        /// <param name="collider"></param>
         protected override void OnHit(Collision2D collider)
         {
             // Do some checking if necessary
@@ -39,15 +58,21 @@ namespace Knockback.Derived
             transform.parent = collider.transform;
         }
 
+        /// <summary>
+        /// Change sprite and destroy the object from the master pooler object
+        /// </summary>
         protected override void OnFinishSplashDamage()
         {
-            //todo: Change the sprite inside the sprite renderer
+            //Change the sprite inside the sprite renderer
             Destroy(gameObject, 0.5f);
         }
 
+        /// <summary>
+        /// Explode and add explosion effects here
+        /// </summary>
         protected override void OnTimerEnd()
         {
-            //todo: Add the explosion effect here
+            //Add the explosion effect here
             ApplySplashDamage(transform.position, maxDamageRadius, maxDamageAmount, layerMask);
         }
 

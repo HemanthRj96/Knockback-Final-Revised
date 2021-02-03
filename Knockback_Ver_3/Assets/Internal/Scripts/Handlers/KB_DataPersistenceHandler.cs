@@ -4,17 +4,20 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Knockback.Handlers
 {
+    /// <summary>
+    /// Simple class to save and load file
+    /// </summary>
     public static class KB_DataPersistenceHandler
     {
-        //todo: Commenting :: Data persistence handler
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
-        private static void CreateFile(string filePath)
-        {
-            string targetFilepath = Application.persistentDataPath + filePath;
-            FileStream fileHandle = new FileStream(targetFilepath, FileMode.Create);
-            fileHandle.Close();
-        }
-
+        /// <summary>
+        /// To save the data to the target filePath
+        /// </summary>
+        /// <typeparam name="T">Type of the data</typeparam>
+        /// <param name="filePath">Name of the filePath with preceding forward slash</param>
+        /// <param name="data">The data itself</param>
         public static void SaveData<T>(string filePath, T data) where T : class
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -29,6 +32,12 @@ namespace Knockback.Handlers
             fileHandle.Close();
         }
 
+        /// <summary>
+        /// To load the data from the filePath
+        /// </summary>
+        /// <typeparam name="T">Type of the data type</typeparam>
+        /// <param name="filePath">Name of the filePath</param>
+        /// <param name="data">The data itself</param>
         public static void LoadData<T>(string filePath, out T data) where T : class
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -43,6 +52,23 @@ namespace Knockback.Handlers
             else { data = default(T); }
         }
 
-        public static bool SaveExists(string filePath) { return File.Exists(Application.persistentDataPath + filePath); }
+        /// <summary>
+        /// Returns true if the file already exist in the filePath
+        /// </summary>
+        /// <param name="filePath">The filePath</param>
+        /// <returns></returns>
+        public static bool SaveExists(string filePath) => File.Exists(Application.persistentDataPath + filePath);
+
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Create a file
+        /// </summary>
+        /// <param name="filePath">Name of the file with a forward slash</param>
+        private static void CreateFile(string filePath)
+        {
+            FileStream fileHandle = new FileStream(filePath, FileMode.Create);
+            fileHandle.Close();
+        }        
     }
 }

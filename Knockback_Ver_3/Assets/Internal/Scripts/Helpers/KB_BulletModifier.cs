@@ -303,7 +303,7 @@ namespace Knockback.Helpers
             IDamage damageHandler;
             if (hit.collider.TryGetComponent(out damageHandler))
             {
-                damageHandler?.ApplyDamage(m_impactDamage, bulletCore.source);
+                damageHandler?.ApplyDamage(m_impactDamage, bulletCore.m_source);
                 return true;
             }
             else return false;

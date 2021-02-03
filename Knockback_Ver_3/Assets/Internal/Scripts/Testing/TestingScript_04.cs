@@ -14,7 +14,7 @@ namespace Knockback.Testing
         }
 
 
-        public void RemoveDamage(float damage, GameObject source)
+        public void RemoveDamage(float damage)
         {
             throw new System.NotImplementedException();
         }

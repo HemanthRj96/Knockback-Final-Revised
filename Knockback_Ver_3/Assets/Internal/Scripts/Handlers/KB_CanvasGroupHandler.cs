@@ -6,7 +6,9 @@ using Knockback.Helpers;
 
 namespace Knockback.Handlers
 {
-    //todo: Commenting
+    /// <summary>
+    /// Use this class to manage multiple canvas groups in a single scene which are controlled by buttons
+    /// </summary>
     public class KB_CanvasGroupHandler : MonoBehaviour
     {
         //** --INTERNAL CLASSES--
@@ -37,9 +39,6 @@ namespace Knockback.Handlers
         [SerializeField] private string m_canvasGroupHandlerName = "_CanvasGroupHandler_";
         [SerializeField] private List<_CanvasGroups> m_canvasGroupList = new List<_CanvasGroups>();
         [SerializeField] private List<_ButtonLookup> m_buttonList = new List<_ButtonLookup>();
-
-
-        private int activeCanvasGroupIndex = -1;
 
 
         //** --METHODS--

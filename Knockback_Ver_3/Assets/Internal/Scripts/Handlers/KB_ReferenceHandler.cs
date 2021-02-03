@@ -1,19 +1,26 @@
-﻿using Knockback.Utility;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Knockback.Handlers
 {
+    /// <summary>
+    /// Method that keeps and handles all the dereferncing of the objects
+    /// </summary>
     public static class KB_ReferenceHandler
     {
+        //** --ATTRIBUTES--
+        //** --PUBLIC ATTRIBUTES--
 
-        public static Dictionary<string, Object> container = new Dictionary<string, Object>();
+        public static Dictionary<string, Object> m_container = new Dictionary<string, Object>();
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
         /// <summary>
         /// Use this function to add object reference to the world reference handler
         /// </summary>
         /// <param name="value">The class reference you need to store</param>
-        public static void Add(Object value) => container.Add(value.name, value);
+        public static void Add(Object value) => m_container.Add(value.name, value);
 
         /// <summary>
         /// Use this function to add object reference to the world reference handler
@@ -23,13 +30,7 @@ namespace Knockback.Handlers
         {
             if (DuplicateCheck(tag))
                 return;
-            container.Add(tag, value);
-        }
-
-        public static void PrintAllValues()
-        {
-            foreach (var temp in container)
-                Debug.Log($"{temp.Key}, {temp.Value}");
+            m_container.Add(tag, value);
         }
 
         /// <summary>
@@ -40,7 +41,7 @@ namespace Knockback.Handlers
         {
             string key = FindTag(value);
             if (key != null)
-                container.Remove(key);
+                m_container.Remove(key);
         }
 
         /// <summary>
@@ -49,8 +50,8 @@ namespace Knockback.Handlers
         /// <param name="tag">The tag you want to remove</param>
         public static void Remove(string tag)
         {
-            if (container.ContainsKey(tag))
-                container.Remove(tag);
+            if (m_container.ContainsKey(tag))
+                m_container.Remove(tag);
         }
 
         /// <summary>
@@ -59,9 +60,9 @@ namespace Knockback.Handlers
         /// <param name="value"></param>
         public static void RemoveAll<T>() where T : class
         {
-            foreach (string tag in container.Keys)
-                if (container[tag] is T)
-                    container.Remove(tag);
+            foreach (string tag in m_container.Keys)
+                if (m_container[tag] is T)
+                    m_container.Remove(tag);
         }
 
         /// <summary>
@@ -71,9 +72,9 @@ namespace Knockback.Handlers
         /// <returns></returns>
         public static Object GetReference(string tag)
         {
-            if (!container.ContainsKey(tag))
+            if (!m_container.ContainsKey(tag))
                 return null;
-            return container[tag];
+            return m_container[tag];
         }
 
         /// <summary>
@@ -85,10 +86,10 @@ namespace Knockback.Handlers
         public static bool GetReference<T>(out T value) where T : class
         {
             value = null;
-            foreach (string tag in container.Keys)
-                if (container[tag] is T)
+            foreach (string tag in m_container.Keys)
+                if (m_container[tag] is T)
                 {
-                    value = container[tag] as T;
+                    value = m_container[tag] as T;
                     return true;
                 }
             return false;
@@ -104,9 +105,9 @@ namespace Knockback.Handlers
         public static bool GetReference<T>(string tag, out T value) where T : class
         {
             value = null;
-            if (!container.ContainsKey(tag))
+            if (!m_container.ContainsKey(tag))
                 return false;
-            value = container[tag] as T;
+            value = m_container[tag] as T;
             return true;
         }
 
@@ -121,22 +122,36 @@ namespace Knockback.Handlers
             bool flag = false;
             value = new List<T>();
 
-            foreach (string tag in container.Keys)
-                if (container[tag] is T)
+            foreach (string tag in m_container.Keys)
+                if (m_container[tag] is T)
                 {
-                    value.Add(container[tag] as T);
+                    value.Add(m_container[tag] as T);
                     flag = true;
                 }
             return flag;
         }
 
-        public static bool CheckIfReferenceExists(Object value) => container.ContainsValue(value);
+        /// <summary>
+        /// Returns true if the reference exists
+        /// </summary>
+        /// <param name="value">Target value</param>
+        public static bool CheckIfReferenceExists(Object value) => m_container.ContainsValue(value);
 
-        public static bool CheckIfReferenceExists(string tag) => container.ContainsKey(tag);
+        /// <summary>
+        /// Returns true if the reference exists
+        /// </summary>
+        /// <param name="tag">Target tag</param>
+        public static bool CheckIfReferenceExists(string tag) => m_container.ContainsKey(tag);
 
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Returns true if duplicate exists
+        /// </summary>
+        /// <param name="tag"></param>
         private static bool DuplicateCheck(string tag)
         {
-            if (container.ContainsKey(tag))
+            if (m_container.ContainsKey(tag))
             {
                 Debug.LogError($"Found duplicate key :{tag}");
                 return true;
@@ -144,9 +159,13 @@ namespace Knockback.Handlers
             return false;
         }
 
+        /// <summary>
+        /// Returns the tag for the target value
+        /// </summary>
+        /// <param name="value">Target value</param>
         private static string FindTag(Object value)
         {
-            foreach (var temp in container)
+            foreach (var temp in m_container)
                 if (temp.Value == value)
                     return temp.Key;
             return null;

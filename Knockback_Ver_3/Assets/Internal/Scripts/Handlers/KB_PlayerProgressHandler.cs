@@ -5,87 +5,126 @@ using System;
 
 namespace Knockback.Handlers
 {
+    //todo: Refactoring - KB_PlayerProgressHandler
+
+    /// <summary>
+    /// This method handles all the player progress
+    /// </summary>
     public class KB_PlayerProgressHandler : MonoBehaviour
     {
-        //todo: Commenting
+        //** --INTERNAL CLASS--
 
         internal class XPClass
         {
             public XPClass(int _level, float _currentXP)
             {
-                this._level = _level;
-                this._currentXP = _currentXP;
+                this.mi_level = _level;
+                this.mi_currentXP = _currentXP;
             }
 
             public XPClass() { }
 
-            private float _currentXP = 0;
-            private int _level = 1;
+            private float mi_currentXP = 0;
+            private int mi_level = 1;
 
-            private int UnitXP { get; } = 1000;
-            private float XPIncrementer { get; } = 0.2f;
-            public int MinXP { get; } = 0;
-            public int MaxXP { get { return (int)(UnitXP + (UnitXP * XPIncrementer * (Level - 1))); } }
-            public float CurrentXP { get { return _currentXP; } }
-            public float AddXP { set { _currentXP += value; } }
-            public int Level { get { return _level; } }
-            public bool CheckXP { get { return _currentXP > MaxXP; } }
+            private int unitXP { get; } = 1000;
+            private float xPIncrementer { get; } = 0.2f;
+            public int minXP { get; } = 0;
+            public int maxXP { get { return (int)(unitXP + (unitXP * xPIncrementer * (level - 1))); } }
+            public float currentXP { get { return mi_currentXP; } }
+            public float addXP { set { mi_currentXP += value; } }
+            public int level { get { return mi_level; } }
+            public bool checkXP { get { return mi_currentXP > maxXP; } }
 
-            public void LevelUp() => _level++;
-            public void Reset() { _level = 1; _currentXP = 0; }
+            public void LevelUp() => mi_level++;
+            public void Reset() { mi_level = 1; mi_currentXP = 0; }
         }
 
-        private static XPClass xpHandle = new XPClass();
-        private KB_DatabaseHandler dataBase = new KB_DatabaseHandler();
-        public string xpString { get; private set; }
+        //** --ATTRIBUTES--
+        //** --PRIVATE ATTRIBUTES
 
+        private static XPClass m_xpHandle = new XPClass();
+        private KB_DatabaseHandler m_dataBase = new KB_DatabaseHandler();
 
-        public void Start()
-        {
-            InitXPHandle();
-        }
+        //** --PUBLIC REFERENCE--
 
-        public void AddXP(float xpAmount) => xpHandle.AddXP = xpAmount;
+        public string m_xpString { get; private set; }
 
-        public void LevelUp()
-        {
-            if (xpHandle.CheckXP)
-            {
-                xpHandle.LevelUp();
-                OnLevelUp();
-            }
-        }
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
-        public void OnLevelUp() => KB_EventHandler.Invoke("LEVELUP_EVENT");
+        /// <summary>
+        /// Method to add XP to the progress amount
+        /// </summary>
+        /// <param name="xpAmount"></param>
+        public void AddXP(float xpAmount) => m_xpHandle.addXP = xpAmount;
 
-        private void InitXPHandle()
+        //** --PRIVATE METHODS--
+
+        /// <summary>
+        /// Do this onStart
+        /// </summary>
+        private void Start() => Bootstrapper();
+
+        /// <summary>
+        /// Method initializes the dafult values
+        /// </summary>
+        private void Bootstrapper()
         {
             int _level;
             float _currentXP;
             if (CheckDatabase())
             {
-                xpString = dataBase.GetPlayerData().GetValue();
+                m_xpString = m_dataBase.GetPlayerData().GetValue();
                 ParseValueFromString(out _level, out _currentXP);
-                xpHandle = new XPClass(_level, _currentXP);
+                m_xpHandle = new XPClass(_level, _currentXP);
             }
         }
 
+        /// <summary>
+        /// Returns true if a database exists and false otherwise
+        /// </summary>
         private bool CheckDatabase()
         {
             if (KB_DataPersistenceHandler.SaveExists(KB_DatabaseHandler.GetTargetDirectory()))
             {
-                KB_DataPersistenceHandler.LoadData(KB_DatabaseHandler.GetTargetDirectory(), out dataBase);
+                KB_DataPersistenceHandler.LoadData(KB_DatabaseHandler.GetTargetDirectory(), out m_dataBase);
                 return true;
             }
             return false;
         }
 
+        /// <summary>
+        /// Method to parse values from strings
+        /// </summary>
+        /// <param name="_level"></param>
+        /// <param name="_currentXP"></param>
         private void ParseValueFromString(out int _level, out float _currentXP)
         {
-            _level = int.Parse(xpString.Split('|')[0]);
-            _currentXP = float.Parse(xpString.Split('|')[1]);
+            _level = int.Parse(m_xpString.Split('|')[0]);
+            _currentXP = float.Parse(m_xpString.Split('|')[1]);
         }
 
-        private string CreateString() => $"{xpHandle.CurrentXP}|{xpHandle.Level}";
+        /// <summary>
+        /// Method to encode level and xp into string
+        /// </summary>
+        private string CreateString() => $"{m_xpHandle.currentXP}|{m_xpHandle.level}";
+
+        /// <summary>
+        /// Do this on level up
+        /// </summary>
+        private void LevelUp()
+        {
+            if (m_xpHandle.checkXP)
+            {
+                m_xpHandle.LevelUp();
+                OnLevelUp();
+            }
+        }
+
+        /// <summary>
+        /// Call event on level up
+        /// </summary>
+        private void OnLevelUp() => KB_EventHandler.Invoke("LEVELUP_EVENT");
     }
 }

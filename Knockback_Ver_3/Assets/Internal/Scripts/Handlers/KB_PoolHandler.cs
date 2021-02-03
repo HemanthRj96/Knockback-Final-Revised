@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using Knockback.Utility;
 
 namespace Knockback.Handlers
 {
+    //todo: Minor refactoring - KB_PoolHandler
+
+    /// <summary>
+    /// Method that handles object pools
+    /// </summary>
     public class KB_PoolHandler : KB_Singleton<KB_PoolHandler>
     {
+        //** --INTERNAL CLASS--
 
         [System.Serializable]
         public class PoolData
@@ -23,21 +28,25 @@ namespace Knockback.Handlers
             public int poolSize;
         }
 
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
+
         [Header("Pre-made pool defaults")]
         [Space]
 
         [SerializeField]
-        private List<PoolData> poolList = new List<PoolData>();
-        private Dictionary<string, Queue<GameObject>> poolCollection = new Dictionary<string, Queue<GameObject>>();
+        private List<PoolData> m_poolList = new List<PoolData>();
+        private Dictionary<string, Queue<GameObject>> m_poolCollection = new Dictionary<string, Queue<GameObject>>();
 
-        protected override void Awake() => base.Awake();
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
         /// <summary>
         /// Create a pool automatically from the pool list
         /// </summary>
         public void InitializePool()
         {
-            foreach (PoolData pool in poolList)
+            foreach (PoolData pool in m_poolList)
             {
                 Queue<GameObject> tempQueue = new Queue<GameObject>();
                 for (int index = 0; index < pool.poolSize; index++)
@@ -46,7 +55,7 @@ namespace Knockback.Handlers
                     tempGameObject.SetActive(false);
                     tempQueue.Enqueue(tempGameObject);
                 }
-                poolCollection.Add(pool.tag, tempQueue);
+                m_poolCollection.Add(pool.tag, tempQueue);
             }
         }
 
@@ -59,7 +68,7 @@ namespace Knockback.Handlers
         public void CreatePool(string tag, GameObject prefab, int size)
         {
             Queue<GameObject> tempQueue = new Queue<GameObject>();
-            poolList.Add(new PoolData(tag, prefab, size));
+            m_poolList.Add(new PoolData(tag, prefab, size));
 
             for (int index = 0; index < size; index++)
             {
@@ -67,7 +76,7 @@ namespace Knockback.Handlers
                 tempGameObject.SetActive(false);
                 tempQueue.Enqueue(tempGameObject);
             }
-            poolCollection.Add(tag, tempQueue);
+            m_poolCollection.Add(tag, tempQueue);
         }
 
         /// <summary>
@@ -77,46 +86,50 @@ namespace Knockback.Handlers
         /// <returns></returns>
         public GameObject GetFromPool(string tag)
         {
-            if (!poolCollection.ContainsKey(tag))
+            if (!m_poolCollection.ContainsKey(tag))
             {
                 new KBLog("--INVALID TAG--", 1);
                 return null;
             }
 
-            GameObject targetObject = poolCollection[tag].Dequeue();
+            GameObject targetObject = m_poolCollection[tag].Dequeue();
             targetObject.SetActive(true);
-            poolCollection[tag].Enqueue(targetObject);
+            m_poolCollection[tag].Enqueue(targetObject);
             return targetObject;
         }
 
-        public bool DoesPoolExist(string tag)
-        {
-            return poolCollection.ContainsKey(tag);
-        }
+        /// <summary>
+        /// Returns true if the pool exists already
+        /// </summary>
+        /// <param name="tag">Pool tag</param>
+        public bool DoesPoolExist(string tag) => m_poolCollection.ContainsKey(tag);
 
         /// <summary>
         /// Call this method to remove a pool
         /// </summary>
         /// <param name="tag">Name of the pool</param>
         public void DestroyPool(string tag)
-        {            
-            if (poolCollection.ContainsKey(tag))
+        {
+            if (m_poolCollection.ContainsKey(tag))
             {
-                foreach(var item in poolCollection[tag])
+                foreach (var item in m_poolCollection[tag])
                 {
                     Destroy(item.gameObject);
                 }
-                poolCollection.Remove(tag);
+                m_poolCollection.Remove(tag);
 
-                for (int index = 0; index < poolList.Count; index++)
+                for (int index = 0; index < m_poolList.Count; index++)
                 {
-                    if (poolList[index].tag == tag)
+                    if (m_poolList[index].tag == tag)
                     {
-                        poolList.RemoveAt(index);
+                        m_poolList.RemoveAt(index);
                         break;
                     }
                 }
             }
         }
+
+        //** --PRIVATE METHODS--
+
     }
 }

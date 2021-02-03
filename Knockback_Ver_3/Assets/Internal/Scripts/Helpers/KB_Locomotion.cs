@@ -12,8 +12,8 @@ namespace Knockback.Helpers
         public KB_Locomotion(KB_PlayerController controlledActor)
         {
             this.controlledActor = controlledActor;
-            cachedRigidbody = controlledActor.cachedRigidbody;
-            cachedSpriteRenderer = controlledActor.cachedSpriteRenderer;
+            cachedRigidbody = controlledActor.m_cachedRigidbody;
+            cachedSpriteRenderer = controlledActor.m_cachedSpriteRenderer;
         }
 
         // Cached variables

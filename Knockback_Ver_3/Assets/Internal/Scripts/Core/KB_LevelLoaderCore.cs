@@ -9,21 +9,24 @@ namespace Knockback.Core
     public class KB_LevelLoaderCore : MonoBehaviour
     {
         //todo: Network implementation part
+        //todo: Should refactor the code - KB_LevelLoaderCore
+
+        //** --SERIALIZED ATTRIBUTES--
 
         [Header("Level Manager Settings")]
         [Space]
-        [SerializeField] protected LevelNames targetLevel;
-        [SerializeField] protected LoadSceneMode targetLoadSceneMode = LoadSceneMode.Single;
-        [SerializeField] protected List<KB_LevelLoaderCore> forwardNavigation = new List<KB_LevelLoaderCore>();
-        [SerializeField] protected List<KB_LevelLoaderCore> backwardNavigation = new List<KB_LevelLoaderCore>();
+        [SerializeField] protected LevelNames m_targetLevel;
+        [SerializeField] protected LoadSceneMode m_targetLoadSceneMode = LoadSceneMode.Single;
+        [SerializeField] protected List<KB_LevelLoaderCore> m_forwardNavigation = new List<KB_LevelLoaderCore>();
+        [SerializeField] protected List<KB_LevelLoaderCore> m_backwardNavigation = new List<KB_LevelLoaderCore>();
+
+        //** --PUBLIC ATTRIBUTES--
 
         [HideInInspector]
-        public bool isLevelLoaded { get; protected set; }
+        public bool m_isLevelLoaded { get; protected set; }
 
-        /// <summary>
-        /// This code runs first even before awake function.
-        /// </summary>
-        protected virtual void InitializeOnLoad() { SceneManager.sceneUnloaded += OnLevelUnload; }
+        //** --METHODS--
+        //** --PUBLIC METHODS--
 
         /// <summary>
         /// Used to load the target level in the forward direction from the current level
@@ -38,7 +41,6 @@ namespace Knockback.Core
         public AsyncOperation NavigateBackward(int levelIndex) { return GetTargetBackwardNavigation((LevelNames)levelIndex); }
 
         public void NavigateForwardForButtons(int levelIndex) { GetTargetForwardNavigation((LevelNames)levelIndex); }
-
         public void NavigateBackwardForButtons(int levelIndex) { GetTargetBackwardNavigation((LevelNames)levelIndex); }
 
 
@@ -57,9 +59,9 @@ namespace Knockback.Core
             AsyncOperation operation = null;
             try
             {
-                if (targetLevel == LevelNames.DefaultNull)
+                if (m_targetLevel == LevelNames.DefaultNull)
                     throw new Exception();
-                operation = SceneManager.LoadSceneAsync(targetLevel.ToString(), targetLoadSceneMode);
+                operation = SceneManager.LoadSceneAsync(m_targetLevel.ToString(), m_targetLoadSceneMode);
             }
             catch (Exception)
             {
@@ -68,7 +70,7 @@ namespace Knockback.Core
             }
             // Initialize the level
             InitializeOnLoad();
-            isLevelLoaded = true;
+            m_isLevelLoaded = true;
             return operation;
         }
 
@@ -81,6 +83,12 @@ namespace Knockback.Core
             return UnloadLevel();
         }
 
+        //** --PROTECTED METHODS--
+
+        /// <summary>
+        /// This code runs first even before awake function.
+        /// </summary>
+        protected virtual void InitializeOnLoad() { SceneManager.sceneUnloaded += OnLevelUnload; }
 
         /// <summary>
         /// Run this function to unload current level; However this function should be only used if the loading 
@@ -91,12 +99,12 @@ namespace Knockback.Core
         {
             try
             {
-                if (targetLoadSceneMode != LoadSceneMode.Additive)
+                if (m_targetLoadSceneMode != LoadSceneMode.Additive)
                     throw new Exception();
-                if (targetLevel == LevelNames.DefaultNull)
+                if (m_targetLevel == LevelNames.DefaultNull)
                     throw new Exception();
                 AsyncOperation operation;
-                operation = SceneManager.UnloadSceneAsync(targetLevel.ToString(), UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+                operation = SceneManager.UnloadSceneAsync(m_targetLevel.ToString(), UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
                 return operation;
             }
             catch (Exception)
@@ -116,10 +124,9 @@ namespace Knockback.Core
             //try { CrossFader.instance.EndFade(); }
             //catch (Exception) { Debug.Log("--CROSSFADER NOT INTIALIZED--"); }
 
-            isLevelLoaded = false;
+            m_isLevelLoaded = false;
             // Do other logic to upon unloading the level
         }
-
 
         /// <summary>
         /// Method to load a target level from the current level
@@ -129,9 +136,9 @@ namespace Knockback.Core
         protected AsyncOperation GetTargetForwardNavigation(LevelNames targetLevel)
         {
             AsyncOperation operation = null;
-            foreach (var level in forwardNavigation)
+            foreach (var level in m_forwardNavigation)
             {
-                if (level.targetLevel == targetLevel)
+                if (level.m_targetLevel == targetLevel)
                 {
                     operation = level.LoadLevel();
                     break;
@@ -150,9 +157,9 @@ namespace Knockback.Core
         protected AsyncOperation GetTargetBackwardNavigation(LevelNames targetLevel)
         {
             AsyncOperation operation = null;
-            foreach (var level in backwardNavigation)
+            foreach (var level in m_backwardNavigation)
             {
-                if (level.targetLevel == targetLevel)
+                if (level.m_targetLevel == targetLevel)
                 {
                     operation = level.LoadLevel();
                     break;
@@ -162,5 +169,9 @@ namespace Knockback.Core
                 Debug.LogError("--INVALID FUNCTION PARAMETER--:LevelManagerBase:GetTargetBackwardNavigation():targetLevel");
             return operation;
         }
+
+        //** --PRIVATE METHODS--
+
+
     }
 }

@@ -5,14 +5,34 @@ using UnityEngine;
 
 namespace Knockback.Core
 {
+    /// <summary>
+    /// Inherit this class to any gameObject that implements splash damage
+    /// </summary>
     public class KB_SplashDamageCore : MonoBehaviour
     {
+        //** --ATTRIBUTES--
+        //** --PROTECTED ATTRIBUTES--
+
         /// <summary>
         /// Contains all the overlapped objects
         /// </summary>
-        protected Dictionary<GameObject, float> overlappedObjects = new Dictionary<GameObject, float>();
+        protected Dictionary<GameObject, float> m_overlappedObjects = new Dictionary<GameObject, float>();
 
-        protected GameObject source;
+        /// <summary>
+        /// Source game object
+        /// </summary>
+        protected GameObject m_source;
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
+
+        /// <summary>
+        /// Method to add the source game object
+        /// </summary>
+        /// <param name="source"></param>
+        public void SetSource(GameObject source) => m_source = source;
+
+        //** --PROTECTED METHODS--
 
         /// <summary>
         /// Invoke this method to apply splash damage at any point
@@ -45,8 +65,8 @@ namespace Knockback.Core
 
                 Debug.LogError($"Collided object={overlappedGameObject}|Distance from collider={distanceFromCollider}|Closest point={closestPoint}|Damage percent={damagePercent}|Final damage={finalDamage}");
 
-                damageHandle.ApplyDamage(finalDamage, source);
-                overlappedObjects.Add(overlappedGameObject, finalDamage);
+                damageHandle.ApplyDamage(finalDamage, m_source);
+                m_overlappedObjects.Add(overlappedGameObject, finalDamage);
             }
 
             OnFinishSplashDamage();
@@ -63,11 +83,11 @@ namespace Knockback.Core
         {
             while (iteration > 0)
             {
-                foreach (KeyValuePair<GameObject, float> overlappedObject in overlappedObjects)
+                foreach (KeyValuePair<GameObject, float> overlappedObject in m_overlappedObjects)
                 {
                     try
                     {
-                        overlappedObject.Key.GetComponent<IDamage>().ApplyDamage(overlappedObject.Value * damageReducePercent, source);
+                        overlappedObject.Key.GetComponent<IDamage>().ApplyDamage(overlappedObject.Value * damageReducePercent, m_source);
                     }
                     catch (System.Exception exc)
                     {
@@ -92,6 +112,5 @@ namespace Knockback.Core
         /// Override this function if you have to do anything after the lingering damage
         /// </summary>
         protected virtual void OnFinishLingeringDamage() { return; }
-
     }
 }

@@ -12,38 +12,38 @@ namespace Knockback.Controllers
         //** --SERIALIZED ATTRIBUTES--
 
         [Header("---Backend Settings---")]
-        [SerializeField] private KB_InputSettings _inputSettings = new KB_InputSettings();
-        [SerializeField] private KB_PlayerBackendSettings _playerSettings = new KB_PlayerBackendSettings();
-        [SerializeField] private bool canUse = false;
+        [SerializeField] private KB_InputSettings m_inputSettings = new KB_InputSettings();
+        [SerializeField] private KB_PlayerBackendSettings m_playerSettings = new KB_PlayerBackendSettings();
+        [SerializeField] private bool m_canUse = false;
 
         //** --PUBLIC ATTRIBUTES--
 
         [Header("---Cached Components---")]
-        public SpriteRenderer cachedSpriteRenderer = null;
-        public Rigidbody2D cachedRigidbody = null;
-        public Transform cachedWeaponSlot = null;
+        public SpriteRenderer m_cachedSpriteRenderer = null;
+        public Rigidbody2D m_cachedRigidbody = null;
+        public Transform m_cachedWeaponSlot = null;
 
         //** --PRIVATE ATTRIBUTES--
 
-        private KB_InventoryHandler _inventoryHandler = new KB_InventoryHandler();
-        private KB_Locomotion _locomotionHandler = new KB_Locomotion();
-        private KB_PlayerSlotRotation _playerLookRotation = new KB_PlayerSlotRotation();
-        private KB_PlayerItemHandler _itemHandler = new KB_PlayerItemHandler();
-        private KB_PlayerKnockbackHandler _knockbackHandler = new KB_PlayerKnockbackHandler();
-        private bool canMove = true;
-        private bool isReady = true;
-        private bool isNetworked = false;
+        private KB_InventoryHandler m_inventoryHandler = new KB_InventoryHandler();
+        private KB_Locomotion m_locomotionHandler = new KB_Locomotion();
+        private KB_PlayerSlotRotation m_playerLookRotation = new KB_PlayerSlotRotation();
+        private KB_PlayerItemHandler m_itemHandler = new KB_PlayerItemHandler();
+        private KB_PlayerKnockbackHandler m_knockbackHandler = new KB_PlayerKnockbackHandler();
+        private bool m_canMove = true;
+        private bool m_isReady = true;
+        private bool m_isNetworked = false;
         private const string _CAMERA_CONTROLLER_TAG = "MainCameraController";
 
         //** --PUBLIC REFERENCES--
 
-        public KB_InventoryHandler inventoryHandler { get { return _inventoryHandler; } private set { _inventoryHandler = value; } }
-        public KB_Locomotion locomotionHandler { get { return _locomotionHandler; } private set { _locomotionHandler = value; } }
-        public KB_InputSettings inputSettings { get { return _inputSettings; } private set { _inputSettings = value; } }
-        public KB_PlayerBackendSettings playerSettings { get { return _playerSettings; } private set { _playerSettings = value; } }
-        public KB_PlayerSlotRotation playerSlotRotation { get { return _playerLookRotation; } private set { _playerLookRotation = value; } }
-        public KB_PlayerItemHandler itemHandler { get { return _itemHandler; } private set { _itemHandler = value; } }
-        public KB_PlayerKnockbackHandler knockbackHandler { get { return _knockbackHandler; } private set { _knockbackHandler = value; } }
+        public KB_InventoryHandler inventoryHandler { get { return m_inventoryHandler; } private set { m_inventoryHandler = value; } }
+        public KB_Locomotion locomotionHandler { get { return m_locomotionHandler; } private set { m_locomotionHandler = value; } }
+        public KB_InputSettings inputSettings { get { return m_inputSettings; } private set { m_inputSettings = value; } }
+        public KB_PlayerBackendSettings playerSettings { get { return m_playerSettings; } private set { m_playerSettings = value; } }
+        public KB_PlayerSlotRotation playerSlotRotation { get { return m_playerLookRotation; } private set { m_playerLookRotation = value; } }
+        public KB_PlayerItemHandler itemHandler { get { return m_itemHandler; } private set { m_itemHandler = value; } }
+        public KB_PlayerKnockbackHandler knockbackHandler { get { return m_knockbackHandler; } private set { m_knockbackHandler = value; } }
 
 
         //** --METHODS--
@@ -70,7 +70,7 @@ namespace Knockback.Controllers
         {
             if (!CheckComponentReferenceValidity())
                 return;
-            canUse = true;
+            m_canUse = true;
             PlayerControllerBootstrap();
         }
 
@@ -88,7 +88,7 @@ namespace Knockback.Controllers
         /// </summary>
         private void Update()
         {
-            if (!canUse || !isReady || !canMove)
+            if (!m_canUse || !m_isReady || !m_canMove)
                 return;
             UpdateRoutine();
         }
@@ -98,7 +98,7 @@ namespace Knockback.Controllers
         /// </summary>
         private void FixedUpdate()
         {
-            if (!canUse || !isReady || !canMove)
+            if (!m_canUse || !m_isReady || !m_canMove)
                 return;
             FixedUpdateRoutine();
         }
@@ -108,11 +108,11 @@ namespace Knockback.Controllers
         /// </summary>
         private bool CheckComponentReferenceValidity()
         {
-            if (cachedRigidbody != null & cachedSpriteRenderer != null)
+            if (m_cachedRigidbody != null & m_cachedSpriteRenderer != null)
                 return true;
             else
             {
-                new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {cachedSpriteRenderer}{cachedRigidbody}");
+                new KBLog($"Missing component reference: SpriteRenderer/Rigidbody/PlayerInventory : {m_cachedSpriteRenderer}{m_cachedRigidbody}");
                 return false;
             }
         }
@@ -127,12 +127,12 @@ namespace Knockback.Controllers
             playerSettings = new KB_PlayerBackendSettings();
             playerSlotRotation = new KB_PlayerSlotRotation(this);
             itemHandler = new KB_PlayerItemHandler(this);
-            knockbackHandler = new KB_PlayerKnockbackHandler(this, cachedRigidbody);
+            knockbackHandler = new KB_PlayerKnockbackHandler(this, m_cachedRigidbody);
             StartCoroutine(InventorySlotLoader());
         }
 
         /// <summary>
-        /// Tries slot load after some buffer time
+        /// Slot loading after some buffer time
         /// </summary>
         private IEnumerator InventorySlotLoader()
         {
@@ -145,7 +145,7 @@ namespace Knockback.Controllers
         /// </summary>
         private void UpdateRoutine()
         {
-            if (!isNetworked)
+            if (!m_isNetworked)
             {
                 OfflineInputUpdate();
                 OfflineRotationUpdate();
@@ -161,7 +161,7 @@ namespace Knockback.Controllers
         /// </summary>
         private void FixedUpdateRoutine()
         {
-            if (!isNetworked)
+            if (!m_isNetworked)
             {
                 OfflineMovementUpdate();
             }
@@ -189,19 +189,19 @@ namespace Knockback.Controllers
         }
 
         /// <summary>
-        /// Offline rotation update
+        /// Offline weapon slot rotation update
         /// </summary>
         private void OfflineRotationUpdate()
         {
-            cachedWeaponSlot.rotation = playerSlotRotation.GetCalculatedRotation();
+            m_cachedWeaponSlot.rotation = playerSlotRotation.GetCalculatedRotation();
         }
 
         /// <summary>
-        /// 
+        /// Online weapon slot rotation update
         /// </summary>
         private void OnlineRotationUpdate()
         {
-
+            // Yet to be implemented
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Knockback.Controllers
         /// </summary>
         private void OnlineMovementUpdate()
         {
-
+            // Yet to be implemented
         }        
     }
 }

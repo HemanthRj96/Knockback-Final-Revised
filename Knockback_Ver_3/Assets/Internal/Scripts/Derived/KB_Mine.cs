@@ -7,10 +7,13 @@ using Knockback.Utility;
 
 namespace Knockback.Derived
 {
+    //todo: Should implement animations and FX - KB_Mine
+    //todo: Network implementation - KB_Mine
     public class KB_Mine : KB_ThrowableCore, IUsableEntity
     {
-        //todo: Commenting :: Mine
-        //todo: Network implementation
+        //** --ATTRIBUTES--
+        //** --SERIALIZED ATTRIBUTES--
+
         [Header("Hand grenade backend settings")]
         [Space]
 
@@ -21,23 +24,39 @@ namespace Knockback.Derived
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private LayerMask layerMask;
 
-        public bool canUse { get; set; } = false;
+        //** --PUBLIC ATTRIBUTES--
 
+        public bool i_canUse { get; set; } = false;
+
+
+        //** --METHODS--
+        //** --PUBLIC METHODS--
+
+        /// <summary>
+        /// Interface implementation
+        /// </summary>
+        /// <param name="source"></param>
         public void UseItem(GameObject source)
         {
-            if (!canUse)
+            if (!i_canUse)
                 return;
-            base.source = source;
+            SetSource(source);
             RemoveFromInventory(source);
             Throw(transform.rotation * Vector2.right, throwVelocity);
         }
 
+        /// <summary>
+        /// Change sprite and destroy the object from the master pooler object
+        /// </summary>
         protected override void OnFinishSplashDamage()
         {
-            //todo: Change the sprite inside the sprite renderer
+            //Change the sprite inside the sprite renderer
             Destroy(gameObject, 0.5f);
         }
 
+        /// <summary>
+        /// Attach the mine to that point
+        /// </summary>
         protected override void OnHit(Collision2D collider)
         {
             // Do some checking if necessary
@@ -45,11 +64,18 @@ namespace Knockback.Derived
             transform.parent = collider.transform;
         }
 
-        public void DoIfPlayerCloseBy()
+        /// <summary>
+        /// Explode if any player is closeby and also update animations and FX
+        /// </summary>
+        /// <param name="collider"></param>
+        protected override void OnTriggered(Collider2D collider)
         {
-            //todo: Play some animation
+            //Check if theres any player in close vicinity if yes then do the following
+            //Play animation and maybe add a 0.5 second delay before explosion
             ApplySplashDamage(transform.position, maxDamageRadius, maxDamageAmount, layerMask);
         }
+
+        //** --PRIVATE METHODS--
 
         /// <summary>
         /// Remove this item from the player inventory

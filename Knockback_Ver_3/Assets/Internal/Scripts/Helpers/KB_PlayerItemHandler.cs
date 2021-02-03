@@ -18,7 +18,7 @@ namespace Knockback.Helpers
         {
             if (!value)
                 return;
-            if (controlledActor.cachedWeaponSlot.childCount == 0)
+            if (controlledActor.m_cachedWeaponSlot.childCount == 0)
                 return;
 
            // Get the item from the inventory and use it

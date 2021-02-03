@@ -12,8 +12,8 @@ namespace Knockback.Controllers
 
         [Header("Camera controller backend settings")]
         [Space]
-        [SerializeField] KB_CameraData cameraData = null;
-        [SerializeField] Vector3 cameraRestingPosition;
+        [SerializeField] KB_CameraData m_cameraData = null;
+        [SerializeField] Vector3 m_cameraRestingPosition;
 
         //** --PUBLIC ATTRIBUTES--
 
@@ -21,12 +21,12 @@ namespace Knockback.Controllers
 
         //** --PRIVATE ATTRIBUTES--
 
-        private bool isCameraFollowing => localTarget != null;
-        private Vector3 aimOffset;
-        private Vector3 targetPosition;
-        private Vector3 smoothAimOffset;
-        private bool canUse = false;
-        private Camera mainCamera = null;
+        private bool m_isCameraFollowing => localTarget != null;
+        private Vector3 m_aimOffset;
+        private Vector3 m_targetPosition;
+        private Vector3 m_smoothAimOffset;
+        private bool m_canUse = false;
+        private Camera m_mainCamera = null;
         private const string _REFERENCE_TAG = "MainCameraController";
 
         //** --METHODS--
@@ -42,9 +42,9 @@ namespace Knockback.Controllers
         /// </summary>
         private void FixedUpdate()
         {
-            if (canUse)
+            if (m_canUse)
             {
-                if (isCameraFollowing)
+                if (m_isCameraFollowing)
                 {
                     UpdateCameraPositionAndAimOffset();
                     ClampCameraBounds();
@@ -61,15 +61,15 @@ namespace Knockback.Controllers
         /// </summary>
         private void CameraBootstrap()
         {
-            if (cameraData == null)
+            if (m_cameraData == null)
                 return;
 
             KB_ReferenceHandler.Add(this, _REFERENCE_TAG);
-            transform.position += new Vector3(0, 0, cameraData.cameraRestingZOffset);
-            mainCamera = GetComponentInChildren<Camera>();
-            mainCamera.orthographicSize = cameraData.cameraFOV;
+            transform.position += new Vector3(0, 0, m_cameraData.cameraRestingZOffset);
+            m_mainCamera = GetComponentInChildren<Camera>();
+            m_mainCamera.orthographicSize = m_cameraData.cameraFOV;
             SetToDefaultPosition();
-            canUse = true;
+            m_canUse = true;
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Knockback.Controllers
         private Vector3 GetTargetPosition()
         {
             float displacement = Vector2.Distance(transform.position, localTarget.transform.position);
-            float lerpControlVariable = displacement * cameraData.cameraDampingFactor.magnitude * Time.deltaTime;
+            float lerpControlVariable = displacement * m_cameraData.cameraDampingFactor.magnitude * Time.deltaTime;
 
             return new Vector3
                     (
@@ -104,29 +104,29 @@ namespace Knockback.Controllers
         /// </summary>
         private void UpdateCameraPositionAndAimOffset()
         {
-            targetPosition = GetTargetPosition();
-            aimOffset.Normalize();
-            smoothAimOffset = new Vector3
+            m_targetPosition = GetTargetPosition();
+            m_aimOffset.Normalize();
+            m_smoothAimOffset = new Vector3
                 (
                     Mathf.Lerp
                         (
-                            smoothAimOffset.x,
-                            aimOffset.x,
-                            cameraData.offsetDampingFactor.x * Time.deltaTime
+                            m_smoothAimOffset.x,
+                            m_aimOffset.x,
+                            m_cameraData.offsetDampingFactor.x * Time.deltaTime
                         ),
                     Mathf.Lerp
                         (
-                            smoothAimOffset.y,
-                            aimOffset.y,
-                            cameraData.offsetDampingFactor.y * Time.deltaTime
+                            m_smoothAimOffset.y,
+                            m_aimOffset.y,
+                            m_cameraData.offsetDampingFactor.y * Time.deltaTime
                         ),
                     transform.position.z
                 );
 
             transform.position = new Vector3
                 (
-                    targetPosition.x + (smoothAimOffset.x * cameraData.offsetScaler.x / 10),
-                    targetPosition.y + (smoothAimOffset.y * cameraData.offsetScaler.y / 10),
+                    m_targetPosition.x + (m_smoothAimOffset.x * m_cameraData.offsetScaler.x / 10),
+                    m_targetPosition.y + (m_smoothAimOffset.y * m_cameraData.offsetScaler.y / 10),
                     transform.position.z
                 );
         }
@@ -138,8 +138,8 @@ namespace Knockback.Controllers
         {
             transform.position = new Vector3
                     (
-                        Mathf.Clamp(transform.position.x, cameraData.minimumBounds.x, cameraData.maximumBounds.x),
-                        Mathf.Clamp(transform.position.y, cameraData.minimumBounds.y, cameraData.maximumBounds.y),
+                        Mathf.Clamp(transform.position.x, m_cameraData.minimumBounds.x, m_cameraData.maximumBounds.x),
+                        Mathf.Clamp(transform.position.y, m_cameraData.minimumBounds.y, m_cameraData.maximumBounds.y),
                         transform.position.z
                     );
         }
@@ -147,7 +147,7 @@ namespace Knockback.Controllers
         /// <summary>
         /// Sets the camera's position to the default position
         /// </summary>
-        private void SetToDefaultPosition() => transform.position = cameraRestingPosition;
+        private void SetToDefaultPosition() => transform.position = m_cameraRestingPosition;
 
         /// <summary>
         /// Resets the camera to the defgault position
@@ -164,12 +164,12 @@ namespace Knockback.Controllers
         /// <summary>
         /// Returns the main camera
         /// </summary>
-        public Camera GetCamera() => mainCamera;
+        public Camera GetCamera() => m_mainCamera;
 
         /// <summary>
         /// Adds aim offset to the camera
         /// </summary>
-        public void AddAimOffset(Vector2 offset) => aimOffset = new Vector3(offset.x, offset.y, transform.position.z);
+        public void AddAimOffset(Vector2 offset) => m_aimOffset = new Vector3(offset.x, offset.y, transform.position.z);
 
         /// <summary>
         /// Sets the local target the camera should follow
@@ -180,7 +180,7 @@ namespace Knockback.Controllers
         /// Shakes the camera with a magnitude
         /// </summary>
         /// <param name="magnitude">Magnitude of the shake</param>
-        public void ShakeCameraWithMagnitude(float magnitude) => CameraShaker.Instance.ShakeOnce(magnitude, cameraData.roughness, cameraData.fadeInTime, cameraData.fadeOutTime);
+        public void ShakeCameraWithMagnitude(float magnitude) => CameraShaker.Instance.ShakeOnce(magnitude, m_cameraData.roughness, m_cameraData.fadeInTime, m_cameraData.fadeOutTime);
 
         /// <summary>
         /// Removes the local target and resets the camera positions
@@ -190,6 +190,6 @@ namespace Knockback.Controllers
         /// <summary>
         /// Allows to set the camera resting position externally
         /// </summary>
-        public void SetTheCameraRestingPosition(Vector3 restingPosition) => cameraRestingPosition = restingPosition;
+        public void SetTheCameraRestingPosition(Vector3 restingPosition) => m_cameraRestingPosition = restingPosition;
     }
 }

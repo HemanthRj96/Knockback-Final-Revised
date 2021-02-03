@@ -24,13 +24,13 @@ namespace Knockback.Derived
         [SerializeField] private Animator animator;
         [SerializeField] private LayerMask layerMask;
 
-        public bool canUse { get; set; } = false;
+        public bool i_canUse { get; set; } = false;
 
         public void UseItem(GameObject source)
         {
-            if (!canUse)
+            if (!i_canUse)
                 return;
-            base.source = source;
+            base.m_source = source;
             RemoveFromInventory(source);
             Throw(transform.rotation * Vector2.right, throwVelocity);
         }
@@ -54,7 +54,7 @@ namespace Knockback.Derived
 
         protected override void OnFinishSplashDamage()
         {
-            foreach (KeyValuePair<GameObject, float> overlappedObject in overlappedObjects)
+            foreach (KeyValuePair<GameObject, float> overlappedObject in m_overlappedObjects)
             {
                 // Implement flame attach
                 AddFlameEffect();

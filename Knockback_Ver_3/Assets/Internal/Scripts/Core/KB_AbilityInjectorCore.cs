@@ -13,13 +13,13 @@ namespace Knockback.Core
         //** --SERIALIZED ATTRIBUTES--
 
         [Header("Ability backend settings")]
-        [SerializeField] private KB_MasterAbility targetAbility = new KB_MasterAbility();
-        [SerializeField] private bool hasTriggerVolume = true;
+        [SerializeField] private KB_MasterAbility m_targetAbility = new KB_MasterAbility();
+        [SerializeField] private bool m_hasTriggerVolume = true;
 
         //** --PRIVATE ATTRIBUTES--
 
-        private bool isPickedUp = false;
-        private KB_PlayerController controller = null;
+        private bool m_isPickedUp = false;
+        private KB_PlayerController m_controller = null;
 
 
         //** --METHODS--
@@ -31,7 +31,7 @@ namespace Knockback.Core
         /// <param name="controller"></param>
         public void InvokeExternally(KB_PlayerController controller)
         {
-            targetAbility.StartAbilityRoutine(controller, AbilityEndCallback);
+            m_targetAbility.StartAbilityRoutine(controller, AbilityEndCallback);
         }
 
         //** --PROTECTED METHODS--
@@ -50,12 +50,12 @@ namespace Knockback.Core
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (isPickedUp || !hasTriggerVolume)
+            if (m_isPickedUp || !m_hasTriggerVolume)
                 return;
-            if (collision.TryGetComponent(out controller))
+            if (collision.TryGetComponent(out m_controller))
             {
-                isPickedUp = true;
-                targetAbility.StartAbilityRoutine(controller, AbilityBeginCallback, AbilityEndCallback);
+                m_isPickedUp = true;
+                m_targetAbility.StartAbilityRoutine(m_controller, AbilityBeginCallback, AbilityEndCallback);
             }
         }
     }

@@ -10,21 +10,21 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     //** --ATTRIBUTES--    
     //** --PRIVATE ATTRIBUTES--
 
-    private Vector2 pointA;
-    private Vector2 pointB;
-    private Vector2 direction;
-    private bool shouldIgnoreSelf = true;
-    private Action<GameObject> functionCallback = null;
-    private List<GameObject> collidedObjects = new List<GameObject>();
+    private Vector2 m_pointA;
+    private Vector2 m_pointB;
+    private Vector2 m_direction;
+    private bool m_shouldIgnoreSelf = true;
+    private Action<GameObject> m_functionCallback = null;
+    private List<GameObject> m_collidedObjects = new List<GameObject>();
 
     //** --PUBLIC ATTRIBUTES--
 
-    public bool canUse { get; set; } = true;
-    public KB_BulletModifier bulletModifier = null;
+    public bool i_canUse { get; set; } = true;
+    public KB_BulletModifier m_bulletModifier = null;
 
     //** --PUBLIC REFERENCES--
 
-    public GameObject source { private set; get; }
+    public GameObject m_source { private set; get; }
 
     //** --METHODS--
     //** --PUBLIC METHODS--
@@ -52,25 +52,25 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
             bool shouldRicochet = false
         )
     {
-        this.direction = direction;
-        this.shouldIgnoreSelf = shouldIgnoreSelf;
-        this.functionCallback = functionCallback;
-        bulletModifier.SetDamageAndSpeed(impactDamage, velocity);
+        this.m_direction = direction;
+        this.m_shouldIgnoreSelf = shouldIgnoreSelf;
+        this.m_functionCallback = functionCallback;
+        m_bulletModifier.SetDamageAndSpeed(impactDamage, velocity);
         if (shouldPassthrough)
-            bulletModifier.EnablePassthrough();
+            m_bulletModifier.EnablePassthrough();
         else
-            bulletModifier.DisablePassthrough();
+            m_bulletModifier.DisablePassthrough();
         if (shouldRicochet)
-            bulletModifier.EnableRicochet();
+            m_bulletModifier.EnableRicochet();
         else
-            bulletModifier.DisableRicochet();
+            m_bulletModifier.DisableRicochet();
     }
 
     /// <summary>
     /// Method which returns all the collided objects of this bullet
     /// </summary>
     /// <returns></returns>
-    public List<GameObject> GetCollidedObjects() => collidedObjects;
+    public List<GameObject> GetCollidedObjects() => m_collidedObjects;
 
     //** --PRIVATE METHODS--
 
@@ -82,15 +82,15 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     /// <summary>
     /// Assign the bullet modifier
     /// </summary>
-    private void Awake() => bulletModifier = GetComponent<KB_BulletModifier>();
+    private void Awake() => m_bulletModifier = GetComponent<KB_BulletModifier>();
 
     /// <summary>
     /// Do this on disable
     /// </summary>
     private void OnDisable()
     {
-        functionCallback = null;
-        collidedObjects.Clear();
+        m_functionCallback = null;
+        m_collidedObjects.Clear();
     }
 
     /// <summary>
@@ -98,29 +98,29 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     /// </summary>
     private IEnumerator Fire(GameObject source)
     {
-        this.source = source;
+        this.m_source = source;
         // Propel the bullet
-        bulletModifier.StartBulletTranslation();
+        m_bulletModifier.StartBulletTranslation();
 
-        while (bulletModifier.m_canDetect)
+        while (m_bulletModifier.m_canDetect)
         {
-            pointA = transform.position;
+            m_pointA = transform.position;
             yield return null;
-            pointB = transform.position;
+            m_pointB = transform.position;
 
-            RaycastHit2D hit = bulletModifier.DoRayCast(pointA, transform.rotation * Vector2.right, Vector2.Distance(pointA, pointB));
+            RaycastHit2D hit = m_bulletModifier.DoRayCast(m_pointA, transform.rotation * Vector2.right, Vector2.Distance(m_pointA, m_pointB));
 
             if (hit.collider == null)
                 continue;
-            if (shouldIgnoreSelf && hit.collider.gameObject == source)
+            if (m_shouldIgnoreSelf && hit.collider.gameObject == source)
             {
-                if (bulletModifier.ShouldRicochet())
+                if (m_bulletModifier.ShouldRicochet())
                     DisableSelfIgnore();
                 continue;
             }
 
-            collidedObjects.Add(hit.collider.gameObject);
-            functionCallback?.Invoke(hit.collider.gameObject);
+            m_collidedObjects.Add(hit.collider.gameObject);
+            m_functionCallback?.Invoke(hit.collider.gameObject);
             yield return new WaitUntil(() => OnHit(hit));
         }
     }
@@ -129,10 +129,10 @@ public class KB_BulletCore : MonoBehaviour, IUsableEntity
     /// This is the method invoked when the bullet hits an obstacle
     /// </summary>
     /// <param name="hit"></param>
-    private bool OnHit(RaycastHit2D hit) => bulletModifier.OnHit(hit);
+    private bool OnHit(RaycastHit2D hit) => m_bulletModifier.OnHit(hit);
 
     /// <summary>
     /// Method changes the shouldIngoreSelf to false
     /// </summary>
-    private void DisableSelfIgnore() => shouldIgnoreSelf = false;
+    private void DisableSelfIgnore() => m_shouldIgnoreSelf = false;
 }

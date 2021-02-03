@@ -17,7 +17,7 @@ namespace Knockback.Utility
     /// </summary>
     public interface IUsableEntity
     {
-        bool canUse { get; set; }
+        bool i_canUse { get; set; }
         void UseItem(GameObject source);
     }
 
@@ -37,7 +37,7 @@ namespace Knockback.Utility
     public interface IDamage
     {
         void ApplyDamage(float damage, GameObject source);
-        void RemoveDamage(float damage, GameObject source);
+        void RemoveDamage(float damage);
     }
 
     /// <summary>
