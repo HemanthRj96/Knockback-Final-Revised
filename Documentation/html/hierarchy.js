@@ -1,6 +1,5 @@
 var hierarchy =
 [
-    [ "Knockback.Networked.KB_NetworkedPlayerController.ControllerSettings", "class_knockback_1_1_networked_1_1_k_b___networked_player_controller_1_1_controller_settings.html", null ],
     [ "Knockback.Handlers.GameStateData", "struct_knockback_1_1_handlers_1_1_game_state_data.html", null ],
     [ "Knockback.Core.KB_GunCore.GunData", "class_knockback_1_1_core_1_1_k_b___gun_core_1_1_gun_data.html", null ],
     [ "Knockback.Utility.IDamage", "interface_knockback_1_1_utility_1_1_i_damage.html", [
@@ -9,7 +8,6 @@ var hierarchy =
     ] ],
     [ "Knockback.Utility.IInteractableEntity", "interface_knockback_1_1_utility_1_1_i_interactable_entity.html", null ],
     [ "Knockback.Utility.IMessage", "interface_knockback_1_1_utility_1_1_i_message.html", null ],
-    [ "Knockback.Utility.IPlayerController", "interface_knockback_1_1_utility_1_1_i_player_controller.html", null ],
     [ "Knockback.Utility.IUIAction", "interface_knockback_1_1_utility_1_1_i_u_i_action.html", [
       [ "Knockback.Testing.TestingScript_07", "class_knockback_1_1_testing_1_1_testing_script__07.html", null ]
     ] ],
@@ -42,7 +40,6 @@ var hierarchy =
     [ "Knockback.Utility.KB_Singleton< KB_PoolHandler >", "class_knockback_1_1_utility_1_1_k_b___singleton.html", [
       [ "Knockback.Handlers.KB_PoolHandler", "class_knockback_1_1_handlers_1_1_k_b___pool_handler.html", null ]
     ] ],
-    [ "Knockback.Utility.KBLog", "class_knockback_1_1_utility_1_1_k_b_log.html", null ],
     [ "MonoBehaviour", null, [
       [ "Knockback.Controllers.KB_CameraController", "class_knockback_1_1_controllers_1_1_k_b___camera_controller.html", null ],
       [ "Knockback.Controllers.KB_PlayerController", "class_knockback_1_1_controllers_1_1_k_b___player_controller.html", null ],

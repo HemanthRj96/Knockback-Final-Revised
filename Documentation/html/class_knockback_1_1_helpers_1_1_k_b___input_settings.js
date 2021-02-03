@@ -9,13 +9,13 @@ var class_knockback_1_1_helpers_1_1_k_b___input_settings =
     [ "MovementInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a02834c0a0d3fce2f3889d344c2ae5721", null ],
     [ "ReadyInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a13019d3e523fba161bc9caee2f68ade5", null ],
     [ "SetInputType", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#ad7858aed3831d0dfe0a031a526bc6ddc", null ],
-    [ "cancelInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#af1074a781c955f5e0879c31873e18a9c", null ],
-    [ "dashInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a159f0bede167b0d80cc7ed593e68c129", null ],
-    [ "fireInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#aa852d7abcd8d55308cfc3d7b555c3e10", null ],
-    [ "interactInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a8a087b4af3b5cbda9209f18408a8dbd4", null ],
-    [ "joystickDeadzone", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a04ad21085aa00ee2a8fb94fa2d812787", null ],
-    [ "jumpInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#aa5054d52e9ddd021bb5f769979c47cca", null ],
-    [ "movementXInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a8c689bea10360001e4c91d9576620181", null ],
-    [ "movementYInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a01d2d96a7b955d8e91b66bb864a1fb30", null ],
-    [ "readyInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#ac997e871efac9777648e1fe234828e80", null ]
+    [ "m_cancelInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a37b1fb0f5f4a7ed2dd72e46491504dd0", null ],
+    [ "m_dashInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a8d886d2fc0261d76d96a3cd94d933d3d", null ],
+    [ "m_fireInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#ad1677b0ab761553740e81d574baa5145", null ],
+    [ "m_interactInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#a3bf1ce6100db5ae9e4e8812217fbac8c", null ],
+    [ "m_joystickDeadzone", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#abd1f452739732c5aec2f4ac1139590cf", null ],
+    [ "m_jumpInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#aa0fd4fefe2916d7c0888c30403d2103f", null ],
+    [ "m_movementXInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#ac266bcf3b8c5a00772e678a4d7137535", null ],
+    [ "m_movementYInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#ae5549a88ee9a3865e9beb2bf1083ef9d", null ],
+    [ "m_readyInput", "class_knockback_1_1_helpers_1_1_k_b___input_settings.html#aeb158dbb9a47b53c362eed7a3ffdc4f3", null ]
 ];
