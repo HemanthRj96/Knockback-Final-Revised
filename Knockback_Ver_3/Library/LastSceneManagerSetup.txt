@@ -1,5 +1,0 @@
-sceneSetups:
-- path: Assets/Internal/Scenes/_MainLobby.unity
-  isLoaded: 1
-  isActive: 1
-  isSubScene: 0
